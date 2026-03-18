@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  Admin
+  Guard
+  Resident
+}
+
+enum RoomStatus {
+  Available
+  Occupied
+  Full
+  Unavailable
+  Maintenance
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum AccessType {
+  CheckIn
+  CheckOut
+}
+
+enum VisitStatus {
+  Pending
+  Approved
+  Rejected
+  Completed
+  Cancelled
+}
+
+model User {
+  id          String   @id @default(cuid())
+  first_name  String
+  middle_name String?
+  last_name   String
+  dob         DateTime
+  gender      Gender
+  username    String   @unique
+  password    String
+  qr_code     String   @unique
+  role        Role
+  photo       String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  room_assignment  RoomAssignment[]
+  visitor_requests VisitorRequest[]
+  access_logs      AccessLog[]      @relation("UserAccessLog")
+  scanned_logs     AccessLog[]      @relation("ScannedByGuard")
+}
+
+model Room {
+  id          Int        @id @default(autoincrement())
+  room_number String     @unique
+  capacity    Int
+  status      RoomStatus @default(Available)
+  created_at  DateTime   @default(now())
+
+  assignments RoomAssignment[]
+}
+
+model RoomAssignment {
+  id          Int       @id @default(autoincrement())
+  user_id     String
+  room_id     Int
+  assigned_at DateTime  @default(now())
+  vacated_at  DateTime?
+  is_active   Boolean   @default(true)
+
+  user User @relation(fields: [user_id], references: [id])
+  room Room @relation(fields: [room_id], references: [id])
+
+  @@index([user_id])
+  @@index([room_id])
+}
+
+model Visitor {
+  id            String   @id @default(cuid())
+  first_name    String
+  middle_name   String?
+  last_name     String
+  gender        Gender
+  qr_code       String   @unique
+  qr_expires_at DateTime
+  created_at    DateTime @default(now())
+
+  visit_request VisitorRequest?
+  access_logs   AccessLog[]
+}
+
+model VisitorRequest {
+  id          Int         @id @default(autoincrement())
+  resident_id String
+  visitor_id  String      @unique
+  purpose     String?
+  expected_at DateTime
+  status      VisitStatus @default(Pending)
+  created_at  DateTime    @default(now())
+
+  resident User    @relation(fields: [resident_id], references: [id])
+  visitor  Visitor @relation(fields: [visitor_id], references: [id])
+
+  @@index([resident_id])
+}
+
+model AccessLog {
+  id            Int        @id @default(autoincrement())
+  user_id       String?
+  visitor_id    String?
+  access_type   AccessType
+  timestamp     DateTime   @default(now())
+  scanned_by_id String
+
+  user       User?   @relation("UserAccessLog", fields: [user_id], references: [id])
+  visitor    Visitor? @relation(fields: [visitor_id], references: [id])
+  scanned_by User    @relation("ScannedByGuard", fields: [scanned_by_id], references: [id])
+
+  @@index([user_id])
+  @@index([visitor_id])
+  @@index([timestamp])
+}

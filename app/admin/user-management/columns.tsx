@@ -9,7 +9,11 @@ import {
   Pencil,
   Trash,
   Eye,
-  UserCircle
+  UserCircle,
+  UserCheck,
+  UserX,
+  BadgeCheck,
+  ShieldAlert
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -27,9 +31,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { deleteUser } from "@/lib/actions/user-actions"
+import { toggleUserStatus } from "@/lib/actions/user-actions"
 import { toast } from "sonner"
 import { EditUserDialog } from "./components/edit-user-dialog"
+import { Badge } from "@/components/ui/badge"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -45,6 +50,7 @@ export type User = {
   qr_code: string
   photo?: string | null
   created_at: Date
+  is_active: boolean
 }
 
 const QRCodeCell = ({ value, size = 40 }: { value: string, size?: number }) => {
@@ -147,22 +153,47 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: "is_active",
+    header: "Status",
+    cell: ({ row }) => {
+      const isActive = row.original.is_active
+      return (
+        <Badge
+          variant={isActive ? "default" : "secondary"}
+          className={`gap-1.5 px-2.5 py-0.5 font-medium shadow-sm transition-all duration-300 ${
+            isActive
+              ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-emerald-500/20"
+              : "bg-slate-500/10 text-slate-600 hover:bg-slate-500/20 border-slate-500/20"
+          }`}
+        >
+          {isActive ? (
+            <BadgeCheck className="h-3.5 w-3.5" />
+          ) : (
+            <ShieldAlert className="h-3.5 w-3.5" />
+          )}
+          {isActive ? "Active" : "Inactive"}
+        </Badge>
+      )
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const user = row.original
       const [editOpen, setEditOpen] = useState(false)
-      const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+      const [showToggleStatusDialog, setShowToggleStatusDialog] = useState(false)
       const [isLoading, setIsLoading] = useState(false)
 
-      const handleDelete = async () => {
+
+      const handleToggleStatus = async () => {
         setIsLoading(true)
-        const result = await deleteUser(user.id)
+        const result = await toggleUserStatus(user.id)
         setIsLoading(false)
-        setShowDeleteDialog(false)
+        setShowToggleStatusDialog(false)
         if (result.success) {
-          toast.success("User deleted successfully")
+          toast.success(`User ${user.is_active ? "deactivated" : "activated"} successfully`)
         } else {
-          toast.error(result.error || "Failed to delete user")
+          toast.error(result.error || "Failed to update user status")
         }
       }
 
@@ -181,13 +212,18 @@ export const columns: ColumnDef<User>[] = [
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setShowDeleteDialog(true)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash className="mr-2 h-4 w-4" />
-                Delete
+              <DropdownMenuItem onClick={() => setShowToggleStatusDialog(true)}>
+                {user.is_active ? (
+                  <div className="flex items-center text-amber-600">
+                    <UserX className="mr-2 h-4 w-4" />
+                    Deactivate
+                  </div>
+                ) : (
+                  <div className="flex items-center text-emerald-600">
+                    <UserCheck className="mr-2 h-4 w-4" />
+                    Activate
+                  </div>
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -198,15 +234,20 @@ export const columns: ColumnDef<User>[] = [
             onOpenChange={setEditOpen}
           />
 
+
           <ConfirmationDialog
-            open={showDeleteDialog}
-            onOpenChange={setShowDeleteDialog}
-            onConfirm={handleDelete}
+            open={showToggleStatusDialog}
+            onOpenChange={setShowToggleStatusDialog}
+            onConfirm={handleToggleStatus}
             isLoading={isLoading}
-            title="Delete User?"
-            description={`Are you sure you want to delete ${user.first_name} ${user.last_name}? This will permanently remove their access and assignments.`}
-            confirmText="Delete"
-            variant="destructive"
+            title={user.is_active ? "Deactivate User?" : "Activate User?"}
+            description={
+              user.is_active
+                ? `Are you sure you want to deactivate ${user.first_name} ${user.last_name}? They will no longer be able to log in or use their QR code for access.`
+                : `Are you sure you want to activate ${user.first_name} ${user.last_name}? This will restore their system access.`
+            }
+            confirmText={user.is_active ? "Deactivate" : "Activate"}
+            variant={user.is_active ? "default" : "default"}
           />
         </>
       )

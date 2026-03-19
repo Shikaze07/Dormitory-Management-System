@@ -1,4 +1,5 @@
 import "dotenv/config";
+// Force recompile: 2026-03-19T22:58:00Z
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../generated/prisma/client";
 

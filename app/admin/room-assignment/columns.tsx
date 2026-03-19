@@ -59,11 +59,31 @@ export const columns: ColumnDef<Assignment>[] = [
     header: "Resident",
     filterFn: (row, id, value) => {
       const user = row.original.user
+      if (!user) return false
       const fullName = `${user.first_name} ${user.last_name}`.toLowerCase()
       return fullName.includes(value.toLowerCase())
     },
     cell: ({ row }) => {
       const user = row.original.user
+
+      if (!user) {
+        return (
+          <div className="flex items-center gap-3 opacity-50 italic">
+            <Avatar className="h-9 w-9 border shadow-sm">
+              <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                ?
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="font-medium text-sm">Deleted User</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                Inactive Account
+              </span>
+            </div>
+          </div>
+        )
+      }
+
       return (
         <div className="flex items-center gap-3">
           <Dialog>
@@ -235,7 +255,7 @@ export const columns: ColumnDef<Assignment>[] = [
             onConfirm={handleVacate}
             isLoading={isLoading}
             title="Vacate Resident?"
-            description={`Are you sure you want to vacate ${assignment.user.first_name}? This will mark their stay as inactive and free up the bed.`}
+            description={`Are you sure you want to vacate ${assignment.user?.first_name || 'this resident'}? This will mark their stay as inactive and free up the bed.`}
             confirmText="Vacate"
             variant="default"
           />

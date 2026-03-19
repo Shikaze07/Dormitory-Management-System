@@ -107,6 +107,30 @@ export async function deleteUser(id: string) {
   }
 }
 
+export async function toggleUserStatus(id: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { is_active: true }
+    })
+
+    if (!user) {
+      return { error: "User not found" }
+    }
+
+    await prisma.user.update({
+      where: { id },
+      data: { is_active: !user.is_active }
+    })
+
+    revalidatePath("/admin/user-management")
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to toggle user status:", error)
+    return { error: "Failed to update user status" }
+  }
+}
+
 export async function getUsers() {
   try {
     const users = await prisma.user.findMany({

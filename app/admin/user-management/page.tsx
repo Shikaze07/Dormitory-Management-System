@@ -11,7 +11,7 @@ export default async function UserManagementPage() {
     <div className="container mx-auto  p-7 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-           <div className="flex items-center gap-2 text-primary mb-1">
+          <div className="flex items-center gap-2 text-primary mb-1">
             <DoorOpen className="h-6 w-6" />
             <h2 className="text-3xl font-bold tracking-tight">User Management</h2>
           </div>

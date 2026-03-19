@@ -24,6 +24,10 @@ export async function login(formData: FormData) {
       return { error: "Invalid credentials" }
     }
 
+    if (!user.is_active) {
+      return { error: "Account is deactivated. Please contact administrator." }
+    }
+
     // Verify password
     const passwordMatch = await bcrypt.compare(password, user.password)
 

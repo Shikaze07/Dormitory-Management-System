@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { email } from "zod"
+import { toast } from "sonner"
 
 export function LoginForm({
   className,
@@ -33,7 +34,7 @@ export function LoginForm({
     const result = await login(formData)
     
     if (result?.error) {
-      alert(result.error)
+     toast(result.error)
     }
   }
   return (
@@ -55,7 +56,7 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="text"
-                  placeholder="Your username"
+                  placeholder="Enter username"
                   required
                   value={email}
                   onChange={(e)=>setEmail(e.target.value)}

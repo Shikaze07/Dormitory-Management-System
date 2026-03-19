@@ -53,6 +53,7 @@ model User {
   photo       String?
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  is_active   Boolean  @default(true)
 
   room_assignment  RoomAssignment[]
   visitor_requests VisitorRequest[]

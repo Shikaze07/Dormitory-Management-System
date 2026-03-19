@@ -24,6 +24,7 @@ import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { Separator } from "./ui/separator"
+import { logout } from "@/lib/actions/auth-actions"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -179,7 +180,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         {/* <NavUser user={data.user} /> */}
-        <Button ><LogOutIcon
+        <Button onClick={() => logout()}><LogOutIcon
         />
           Log out</Button>
 

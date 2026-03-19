@@ -1,4 +1,5 @@
 "use client"
+import { login } from "@/lib/actions/auth-actions"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -23,14 +24,17 @@ export function LoginForm({
   const [password,setPassword] = useState('')
 
 
-  const handleSubmit = ()=>{
-    if(email === 'sample@gmail.com' && password === 'pass123'){
-      alert("Logged in successfully!")
-      router.push('/dashboard')
-    }else{
-      alert("Invalid Credentials!")
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const formData = new FormData()
+    formData.append("email", email)
+    formData.append("password", password)
+    
+    const result = await login(formData)
+    
+    if (result?.error) {
+      alert(result.error)
     }
-
   }
   return (
 
@@ -47,11 +51,11 @@ export function LoginForm({
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">Username</FieldLabel>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="you@example.com"
+                  type="text"
+                  placeholder="Your username"
                   required
                   value={email}
                   onChange={(e)=>setEmail(e.target.value)}

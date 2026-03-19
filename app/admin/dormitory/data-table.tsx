@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
+import { DoorOpen } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -65,7 +66,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: 10,
+        pageSize: 5,
       },
     },
   })
@@ -221,4 +222,4 @@ export function DataTable<TData, TValue>({
   )
 }
 
-import { DoorOpen } from "lucide-react"
+

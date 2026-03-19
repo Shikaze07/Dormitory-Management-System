@@ -118,3 +118,43 @@ export async function getUsers() {
     return { error: "Failed to fetch users" }
   }
 }
+
+import { getSession } from "@/lib/auth"
+
+export async function getResidentProfile() {
+  try {
+    const session = await getSession()
+    
+    if (!session || !session.userId) {
+      return { error: "Not authenticated" }
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId as string },
+      include: {
+        room_assignment: {
+          where: { is_active: true },
+          include: {
+            room: true
+          }
+        },
+        visitor_requests: {
+          take: 5,
+          orderBy: { created_at: "desc" },
+          include: {
+            visitor: true
+          }
+        }
+      }
+    })
+
+    if (!user) {
+      return { error: "Resident not found" }
+    }
+
+    return { user }
+  } catch (error) {
+    console.error("Failed to fetch resident profile:", error)
+    return { error: "Failed to fetch resident profile" }
+  }
+}

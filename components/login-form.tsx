@@ -34,7 +34,7 @@ export function LoginForm({
     const result = await login(formData)
     
     if (result?.error) {
-     toast(result.error)
+      toast(<span>{result.error}</span>)
     }
   }
   return (
@@ -99,10 +99,10 @@ export function LoginForm({
           </div>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
+      {/* <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
-      </FieldDescription>
+      </FieldDescription> */}
     </div>
   )
 }

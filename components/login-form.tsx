@@ -13,31 +13,47 @@ import {
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { email } from "zod"
 import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter()
-  const [email,setEmail] = useState('')
-  const [password,setPassword] = useState('')
-
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const formData = new FormData()
-    formData.append("email", email)
-    formData.append("password", password)
-    
-    const result = await login(formData)
-    
-    if (result?.error) {
-      toast(<span>{result.error}</span>)
+    setIsLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append("username", username)
+      formData.append("password", password)
+
+      const result = await login(formData)
+
+      if (result?.error) {
+        toast.error(result.error)
+        setIsLoading(false)
+      } else if (result?.success) {
+        toast.success("Login successfully! Welcome back.")
+        // Small delay to allow toast to be seen
+        setTimeout(() => {
+          router.push(result.redirectTo)
+        }, 1000)
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred. Please try again.")
+      setIsLoading(false)
     }
+
   }
+
   return (
+
 
 
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -52,14 +68,14 @@ export function LoginForm({
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Username</FieldLabel>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
-                  id="email"
+                  id="username"
                   type="text"
                   placeholder="Enter username"
                   required
-                  value={email}
-                  onChange={(e)=>setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </Field>
               <Field>
@@ -72,19 +88,28 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input 
-                id="password" 
-                type="password" 
-                required
-                value={password}
-                onChange={(e)=>setPassword(e.target.value)}
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
               </Field>
-             
-              
+
+
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <a href="#">Sign up</a>
               </FieldDescription>

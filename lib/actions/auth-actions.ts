@@ -7,18 +7,19 @@ import bcrypt from "bcryptjs"
 import { redirect } from "next/navigation"
 
 export async function login(formData: FormData) {
-  const email = formData.get("email") as string
+  const username = formData.get("username") as string
   const password = formData.get("password") as string
 
-  if (!email || !password) {
-    return { error: "Email and password are required" }
+  if (!username || !password) {
+    return { error: "Username and password are required" }
   }
 
   try {
-    // Find user by username (using email field for username in this example)
+    // Find user by username
     const user = await prisma.user.findUnique({
-      where: { username: email },
+      where: { username: username },
     })
+
 
     if (!user) {
       return { error: "Invalid credentials" }
@@ -48,19 +49,20 @@ export async function login(formData: FormData) {
     const cookieStore = await cookies()
     cookieStore.set("session", session, { expires, httpOnly: true })
 
-    // Redirect based on role
+    // Return success and redirect path
+    let redirectTo = "/dashboard"
     if (user.role === "Admin") {
-      redirect("/admin/user-management")
+      redirectTo = "/admin/user-management"
     } else if (user.role === "Resident") {
-      redirect("/resident/profile")
-    } else {
-      redirect("/dashboard")
+      redirectTo = "/resident/profile"
     }
+    
+    return { success: true, redirectTo }
   } catch (error: any) {
-    if (error.message === "NEXT_REDIRECT") throw error
     console.error("Login error:", error)
     return { error: "Something went wrong. Please try again." }
   }
+
 }
 
 export async function logout() {

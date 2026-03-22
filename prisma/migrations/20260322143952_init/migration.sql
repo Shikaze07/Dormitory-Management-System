@@ -10,8 +10,10 @@ CREATE TABLE `User` (
     `password` VARCHAR(191) NOT NULL,
     `qr_code` VARCHAR(191) NOT NULL,
     `role` ENUM('Admin', 'Guard', 'Resident') NOT NULL,
+    `photo` VARCHAR(191) NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
 
     UNIQUE INDEX `User_username_key`(`username`),
     UNIQUE INDEX `User_qr_code_key`(`qr_code`),

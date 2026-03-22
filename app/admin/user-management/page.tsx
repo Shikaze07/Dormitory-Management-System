@@ -23,13 +23,8 @@ export default async function UserManagementPage() {
         <AddUserDialog />
       </div>
       <Separator className="my-6" />
-      {error ? (
-        <div className="p-4 border border-destructive bg-destructive/10 text-destructive rounded-md">
-          {error}
-        </div>
-      ) : (
-        <DataTable columns={columns} data={(users || []) as User[]} />
-      )}
+      <DataTable columns={columns} data={(users || []) as User[]} />
+
     </div>
   )
 }

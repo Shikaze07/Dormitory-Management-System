@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   IconCamera,
   IconChartBar,
@@ -15,17 +15,16 @@ import {
   IconListDetails,
   IconReport,
   IconSearch,
-
   IconSettings,
   IconUsers,
-} from "@tabler/icons-react"
-import { LogOutIcon } from "lucide-react"
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { Separator } from "./ui/separator"
-import { logout } from "@/lib/actions/auth-actions"
-import { NavUser } from "@/components/nav-user"
+} from "@tabler/icons-react";
+import { LogOutIcon } from "lucide-react";
+import { NavDocuments } from "@/components/nav-documents";
+import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
+import { Separator } from "./ui/separator";
+import { logout } from "@/lib/actions/auth-actions";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -34,8 +33,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Button } from "./ui/button"
+} from "@/components/ui/sidebar";
+import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 const data = {
   user: {
@@ -152,13 +152,13 @@ const data = {
       icon: IconFileWord,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader >
-        <SidebarMenu >
+      <SidebarHeader>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
@@ -166,25 +166,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 Logo
-                <span className="text-base font-semibold">Dormitory Management</span>
+                <span className="text-base font-semibold">
+                  Dormitory Management
+                </span>
               </a>
             </SidebarMenuButton>
-
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent >
+      <SidebarContent>
         <NavMain items={data.navMain} />
         {/* <NavDocuments items={data.documents} /> */}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         {/* <NavUser user={data.user} /> */}
-        <Button onClick={() => logout()}><LogOutIcon
-        />
-          Log out</Button>
 
+        <Button onClick={() => {
+          logout();
+          toast.success("Logged out successfully!")
+        }}>
+          <LogOutIcon />
+          Log out
+        </Button>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

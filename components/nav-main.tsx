@@ -40,7 +40,7 @@ export function NavMain({
                   isActive={isActive}
                   className={cn(
                     "transition-all duration-200",
-                    isActive && "bg-sidebar-accent/50 text-sidebar-accent-foreground border-l-2 border-primary rounded-l-none pl-3.5"
+                    isActive && "bg-primary text-sidebar-accent-foreground border-l-2 border-primary rounded-l-none pl-3.5"
                   )}
                 >
                   <Link href={item.url}>

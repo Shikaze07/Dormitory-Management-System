@@ -1,14 +1,11 @@
 "use client"
 
 import {
-  ColumnDef,
-  ColumnFiltersState,
   getFilteredRowModel,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
-  SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table"
 import { 
@@ -39,17 +36,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-}
-
-export function DataTable<TData, TValue>({
+export function DataTable({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [sorting, setSorting] = useState<SortingState>([])
+}) {
+  const [columnFilters, setColumnFilters] = useState([])
+  const [sorting, setSorting] = useState([])
 
   const table = useReactTable({
     data,
@@ -79,7 +71,7 @@ export function DataTable<TData, TValue>({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search room number..."
-              value={(table.getColumn("room_number")?.getFilterValue() as string) ?? ""}
+              value={(table.getColumn("room_number")?.getFilterValue()) ?? ""}
               onChange={(event) =>
                 table.getColumn("room_number")?.setFilterValue(event.target.value)
               }
@@ -87,7 +79,7 @@ export function DataTable<TData, TValue>({
             />
           </div>
           <Select
-            value={(table.getColumn("status")?.getFilterValue() as string) ?? "all"}
+            value={(table.getColumn("status")?.getFilterValue()) ?? "all"}
             onValueChange={(value) =>
               table.getColumn("status")?.setFilterValue(value === "all" ? "" : value)
             }
@@ -221,5 +213,3 @@ export function DataTable<TData, TValue>({
     </div>
   )
 }
-
-

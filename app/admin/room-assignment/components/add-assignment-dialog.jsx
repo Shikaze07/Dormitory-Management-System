@@ -29,14 +29,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { assignmentSchema, AssignmentFormValues } from "@/lib/validations/assignment"
+import { assignmentSchema } from "@/lib/validations/assignment"
 import { createAssignment, getAvailableResidents, getAvailableRooms } from "@/lib/actions/assignment-actions"
 
 export function AddAssignmentDialog() {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [residents, setResidents] = useState<{ id: string; first_name: string; last_name: string; photo: string | null; username: string }[]>([])
-  const [rooms, setRooms] = useState<{ id: number; room_number: string; capacity: number }[]>([])
+  const [residents, setResidents] = useState([])
+  const [rooms, setRooms] = useState([])
   const [isLoadingData, setIsLoadingData] = useState(false)
   
   const [openResident, setOpenResident] = useState(false)
@@ -48,7 +48,7 @@ export function AddAssignmentDialog() {
     reset,
     formState: { errors },
     watch,
-  } = useForm<AssignmentFormValues>({
+  } = useForm({
     resolver: zodResolver(assignmentSchema),
     defaultValues: {
       user_id: "",
@@ -71,7 +71,7 @@ export function AddAssignmentDialog() {
           getAvailableRooms()
         ])
         
-        if (resResidents.success) setResidents((resResidents.residents as any) || [])
+        if (resResidents.success) setResidents(resResidents.residents || [])
         if (resRooms.success) setRooms(resRooms.rooms || [])
         setIsLoadingData(false)
       }
@@ -79,7 +79,7 @@ export function AddAssignmentDialog() {
     }
   }, [open])
 
-  async function onSubmit(data: AssignmentFormValues) {
+  async function onSubmit(data) {
     setIsSubmitting(true)
     try {
       const result = await createAssignment(data)

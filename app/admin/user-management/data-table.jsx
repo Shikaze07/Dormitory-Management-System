@@ -1,8 +1,6 @@
 "use client"
 
 import {
-  ColumnDef,
-  ColumnFiltersState,
   getFilteredRowModel,
   flexRender,
   getCoreRowModel,
@@ -30,16 +28,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-}
-
-export function DataTable<TData, TValue>({
+export function DataTable({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+}) {
+  const [columnFilters, setColumnFilters] = useState([])
 
   const table = useReactTable({
     data,
@@ -66,7 +59,7 @@ export function DataTable<TData, TValue>({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by name..."
-              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              value={(table.getColumn("name")?.getFilterValue()) ?? ""}
               onChange={(event) =>
                 table.getColumn("name")?.setFilterValue(event.target.value)
               }
@@ -74,7 +67,7 @@ export function DataTable<TData, TValue>({
             />
           </div>
           <Select
-            value={(table.getColumn("role")?.getFilterValue() as string) ?? "all"}
+            value={(table.getColumn("role")?.getFilterValue()) ?? "all"}
             onValueChange={(value) =>
               table.getColumn("role")?.setFilterValue(value === "all" ? "" : value)
             }

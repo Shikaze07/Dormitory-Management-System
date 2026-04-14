@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { userSchema, UserFormValues } from "@/lib/validations/user"
+import { userSchema } from "@/lib/validations/user"
 import { createUser } from "@/lib/actions/user-actions"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,15 +25,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Loader2, UserPlus, QrCode, Upload, X, Eye, EyeOff, Info, User } from "lucide-react"
+import { Loader2, UserPlus, Upload, X, Eye, EyeOff, Info, User } from "lucide-react"
 import QRCode from "qrcode"
 
 export function AddUserDialog() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null)
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState(null)
   const [newUserName, setNewUserName] = useState("")
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imagePreview, setImagePreview] = useState(null)
   const [isUploading, setIsUploading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -44,7 +44,7 @@ export function AddUserDialog() {
     setValue,
     reset,
     formState: { errors },
-  } = useForm<UserFormValues>({
+  } = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
       role: "Resident",
@@ -54,7 +54,7 @@ export function AddUserDialog() {
     },
   })
 
-  const onSubmit = async (data: UserFormValues) => {
+  const onSubmit = async (data) => {
     setLoading(true)
     try {
       const result = await createUser(data)
@@ -85,14 +85,14 @@ export function AddUserDialog() {
     setValue("photo", "")
   }
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     // Preview
     const reader = new FileReader()
     reader.onloadend = () => {
-      setImagePreview(reader.result as string)
+      setImagePreview(reader.result)
     }
     reader.readAsDataURL(file)
 
@@ -232,7 +232,7 @@ export function AddUserDialog() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="gender">Gender</Label>
-                      <Select onValueChange={(val) => setValue("gender", val as "Male" | "Female")}>
+                      <Select onValueChange={(val) => setValue("gender", val)}>
                         <SelectTrigger className="bg-background/50">
                           <SelectValue placeholder="Select Gender" />
                         </SelectTrigger>
@@ -259,7 +259,7 @@ export function AddUserDialog() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="role">Role</Label>
-                      <Select defaultValue="Resident" onValueChange={(val) => setValue("role", val as "Admin" | "Guard" | "Resident")}>
+                      <Select defaultValue="Resident" onValueChange={(val) => setValue("role", val)}>
                         <SelectTrigger className="bg-background/50">
                           <SelectValue placeholder="Resident" />
                         </SelectTrigger>
@@ -317,8 +317,6 @@ export function AddUserDialog() {
                     )}
                   </div>
                 </div>
-
-
               </form>
             </div>
 

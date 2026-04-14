@@ -2,10 +2,6 @@
 
 import * as React from "react"
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -61,25 +57,20 @@ import {
 import { Check, ChevronsUpDown, DoorOpen as DoorIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-}
-
-export function DataTable<TData, TValue>({
+export function DataTable({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+}) {
+  const [sorting, setSorting] = React.useState([])
+  const [columnFilters, setColumnFilters] = React.useState([])
+  const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [openRoomFilter, setOpenRoomFilter] = React.useState(false)
 
   // Extract unique rooms from the data for the filter
   const uniqueRooms = React.useMemo(() => {
-    const rooms = new Set<string>()
-    data.forEach((item: any) => {
+    const rooms = new Set()
+    data.forEach((item) => {
       if (item.room?.room_number) {
         rooms.add(item.room.room_number)
       }
@@ -120,7 +111,7 @@ export function DataTable<TData, TValue>({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Filter by resident name..."
-              value={(table.getColumn("user")?.getFilterValue() as string) ?? ""}
+              value={(table.getColumn("user")?.getFilterValue()) ?? ""}
               onChange={(event) =>
                 table.getColumn("user")?.setFilterValue(event.target.value)
               }

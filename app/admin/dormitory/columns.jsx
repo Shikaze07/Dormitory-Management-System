@@ -1,6 +1,5 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { 
@@ -26,52 +25,37 @@ import { Button } from "@/components/ui/button"
 import { deleteRoom } from "@/lib/actions/room-actions"
 import { toast } from "sonner"
 import { EditRoomDialog } from "./components/edit-room-dialog"
-
 import { ConfirmationDialog } from "@/components/shared/confirmation-dialog"
-
-export type Room = {
-  id: number
-  room_number: string
-  capacity: number
-  status: "Available" | "Occupied" | "Full" | "Unavailable" | "Maintenance"
-  occupancy: number
-  created_at: Date
-}
 
 const statusConfig = {
   Available: {
     label: "Available",
-    variant: "success" as const,
     icon: CheckCircle2,
     className: "bg-emerald-500/15 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20",
   },
   Occupied: {
     label: "Occupied",
-    variant: "default" as const,
     icon: Users,
     className: "bg-blue-500/15 text-blue-600 border-blue-500/20 hover:bg-blue-500/20",
   },
   Full: {
     label: "Full",
-    variant: "destructive" as const,
     icon: XCircle,
     className: "bg-rose-500/15 text-rose-600 border-rose-500/20 hover:bg-rose-500/20",
   },
   Maintenance: {
     label: "Maintenance",
-    variant: "warning" as const,
     icon: Hammer,
     className: "bg-amber-500/15 text-amber-600 border-amber-500/20 hover:bg-amber-500/20",
   },
   Unavailable: {
     label: "Unavailable",
-    variant: "secondary" as const,
     icon: AlertTriangle,
     className: "bg-slate-500/15 text-slate-600 border-slate-500/20 hover:bg-slate-500/20",
   },
 }
 
-export const columns: ColumnDef<Room>[] = [
+export const columns = [
   {
     accessorKey: "room_number",
     header: "Room Number",
@@ -122,7 +106,7 @@ export const columns: ColumnDef<Room>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as keyof typeof statusConfig
+      const status = row.getValue("status")
       const config = statusConfig[status]
       const Icon = config.icon
 
@@ -204,4 +188,3 @@ export const columns: ColumnDef<Room>[] = [
     },
   },
 ]
-

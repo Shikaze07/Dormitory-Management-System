@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { PlusCircle, Loader2, DoorOpen, Users, Info } from "lucide-react"
+import { Loader2, DoorOpen, Users, Info, Save } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -14,7 +14,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -25,11 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { roomSchema, RoomFormValues } from "@/lib/validations/room"
-import { createRoom } from "@/lib/actions/room-actions"
+import { roomSchema } from "@/lib/validations/room"
+import { updateRoom } from "@/lib/actions/room-actions"
 
-export function AddRoomDialog() {
-  const [open, setOpen] = useState(false)
+export function EditRoomDialog({ room, open, onOpenChange }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
@@ -39,27 +37,37 @@ export function AddRoomDialog() {
     reset,
     formState: { errors },
     watch,
-  } = useForm<RoomFormValues>({
+  } = useForm({
     resolver: zodResolver(roomSchema),
     defaultValues: {
-      room_number: "",
-      capacity: 4,
-      status: "Available",
+      room_number: room.room_number,
+      capacity: room.capacity,
+      status: room.status,
     },
   })
 
   const currentStatus = watch("status")
 
-  async function onSubmit(data: RoomFormValues) {
+  // Reset form when room changes or dialog opens
+  useEffect(() => {
+    if (open) {
+      reset({
+        room_number: room.room_number,
+        capacity: room.capacity,
+        status: room.status,
+      })
+    }
+  }, [open, room, reset])
+
+  async function onSubmit(data) {
     setIsSubmitting(true)
     try {
-      const result = await createRoom(data)
+      const result = await updateRoom(room.id, data)
       if (result.success) {
-        toast.success("Room created successfully")
-        setOpen(false)
-        reset()
+        toast.success("Room updated successfully")
+        onOpenChange(false)
       } else {
-        toast.error(result.error || "Failed to create room")
+        toast.error(result.error || "Failed to update room")
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.")
@@ -69,33 +77,27 @@ export function AddRoomDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2 shadow-sm">
-          <PlusCircle className="h-4 w-4" />
-          Add Room
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <div className="flex items-center gap-2 text-primary mb-1">
             <DoorOpen className="h-5 w-5" />
-            <DialogTitle>Add New Room</DialogTitle>
+            <DialogTitle>Edit Room: {room.room_number}</DialogTitle>
           </div>
           <DialogDescription>
-            Enter the details for the new dormitory room below.
+            Update the room details below.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="room_number" className="flex items-center gap-1.5">
+            <Label htmlFor="edit_room_number" className="flex items-center gap-1.5">
               <DoorOpen className="h-3.5 w-3.5 text-muted-foreground" />
               Room Number
             </Label>
             <Input 
-              id="room_number" 
-              placeholder="e.g. 101, A-1" 
+              id="edit_room_number" 
+              placeholder="e.g. 101, B-2" 
               {...register("room_number")} 
             />
             {errors.room_number && (
@@ -105,12 +107,12 @@ export function AddRoomDialog() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="capacity" className="flex items-center gap-1.5">
+              <Label htmlFor="edit_capacity" className="flex items-center gap-1.5">
                 <Users className="h-3.5 w-3.5 text-muted-foreground" />
                 Capacity
               </Label>
               <Input 
-                id="capacity" 
+                id="edit_capacity" 
                 type="number" 
                 min="1" 
                 {...register("capacity", { valueAsNumber: true })} 
@@ -123,11 +125,11 @@ export function AddRoomDialog() {
             <div className="space-y-2">
               <Label className="flex items-center gap-1.5">
                 <Info className="h-3.5 w-3.5 text-muted-foreground" />
-                Initial Status
+                Status
               </Label>
               <Select 
-                onValueChange={(value) => setValue("status", value as any)} 
-                defaultValue={currentStatus}
+                onValueChange={(value) => setValue("status", value)} 
+                value={currentStatus}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
@@ -150,7 +152,7 @@ export function AddRoomDialog() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
               Cancel
@@ -159,10 +161,13 @@ export function AddRoomDialog() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  Saving...
                 </>
               ) : (
-                "Create Room"
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Changes
+                </>
               )}
             </Button>
           </DialogFooter>
@@ -171,4 +176,3 @@ export function AddRoomDialog() {
     </Dialog>
   )
 }
-

@@ -1,6 +1,5 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -36,24 +35,7 @@ import {
 } from "@/components/ui/dialog"
 import { ConfirmationDialog } from "@/components/shared/confirmation-dialog"
 
-export type Assignment = {
-  id: number
-  user_id: string
-  room_id: number
-  assigned_at: Date
-  vacated_at: Date | null
-  is_active: boolean
-  user: {
-    first_name: string
-    last_name: string
-    photo: string | null
-  }
-  room: {
-    room_number: string
-  }
-}
-
-export const columns: ColumnDef<Assignment>[] = [
+export const columns = [
   {
     accessorKey: "user",
     header: "Resident",
@@ -86,35 +68,37 @@ export const columns: ColumnDef<Assignment>[] = [
 
       return (
         <div className="flex items-center gap-3">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Avatar className="h-9 w-9 border shadow-sm cursor-pointer hover:opacity-80 transition-opacity">
-                <AvatarImage src={user.photo || undefined} />
-                <AvatarFallback className="bg-primary/5 text-primary text-xs">
-                  {user.first_name[0]}{user.last_name[0]}
-                </AvatarFallback>
-              </Avatar>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>{user.first_name} {user.last_name}</DialogTitle>
-              </DialogHeader>
-              <div className="flex items-center justify-center p-4">
-                {user.photo ? (
-                  <img
-                    src={user.photo}
-                    alt={`${user.first_name} ${user.last_name}`}
-                    className="max-h-[70vh] w-full object-contain rounded-lg border shadow-lg"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground py-12">
-                    <UserIcon className="h-20 w-20 opacity-20" />
-                    <p>No photo available</p>
-                  </div>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Avatar className="h-9 w-9 border shadow-sm">
+             <Dialog>
+              <DialogTrigger asChild>
+                <div className="cursor-pointer hover:opacity-80 transition-opacity">
+                  <AvatarImage src={user.photo || undefined} />
+                  <AvatarFallback className="bg-primary/5 text-primary text-xs">
+                    {user.first_name[0]}{user.last_name[0]}
+                  </AvatarFallback>
+                </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>{user.first_name} {user.last_name}</DialogTitle>
+                </DialogHeader>
+                <div className="flex items-center justify-center p-4">
+                  {user.photo ? (
+                    <img
+                      src={user.photo}
+                      alt={`${user.first_name} ${user.last_name}`}
+                      className="max-h-[70vh] w-full object-contain rounded-lg border shadow-lg"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground py-12">
+                      <UserIcon className="h-20 w-20 opacity-20" />
+                      <p>No photo available</p>
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </Avatar>
           <div className="flex flex-col">
             <span className="font-medium text-sm">
               {user.first_name} {user.last_name}
@@ -275,4 +259,3 @@ export const columns: ColumnDef<Assignment>[] = [
     },
   },
 ]
-

@@ -1,9 +1,10 @@
-import { columns, User } from "./columns"
+import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import { AddUserDialog } from "./components/add-user-dialog"
 import { getUsers } from "@/lib/actions/user-actions"
 import { Separator } from "@/components/ui/separator"
 import { DoorOpen } from "lucide-react"
+
 export default async function UserManagementPage() {
   const { users, error } = await getUsers()
 
@@ -23,7 +24,7 @@ export default async function UserManagementPage() {
         <AddUserDialog />
       </div>
       <Separator className="my-6" />
-      <DataTable columns={columns} data={(users || []) as User[]} />
+      <DataTable columns={columns} data={users || []} />
 
     </div>
   )

@@ -1,10 +1,10 @@
 import { Metadata } from "next"
 import { getVisitorRequests } from "@/lib/actions/visitor-actions"
 import { DataTable } from "./components/data-table"
-import { columns } from "./columns"
 import { AddVisitorDialog } from "./components/add-visitor-dialog"
 import { Separator } from "@/components/ui/separator"
 import { UserPlus, LayoutDashboard, History, UserCheck, ShieldQuestion } from "lucide-react"
+import { columns } from "./columns"
 
 export const metadata: Metadata = {
   title: "Visitor Requests | Resident",

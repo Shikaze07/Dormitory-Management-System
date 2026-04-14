@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { updateUserSchema, UpdateUserFormValues } from "@/lib/validations/user"
+import { updateUserSchema } from "@/lib/validations/user"
 import { updateUser } from "@/lib/actions/user-actions"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,18 +24,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Loader2, Upload, X, Eye, EyeOff, UserPlus, Info, User as UserIcon } from "lucide-react"
-import { User } from "../columns"
+import { Loader2, Upload, X, Eye, EyeOff, Info, User as UserIcon } from "lucide-react"
 
-interface EditUserDialogProps {
-  user: User
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
-
-export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps) {
+export function EditUserDialog({ user, open, onOpenChange }) {
   const [loading, setLoading] = useState(false)
-  const [imagePreview, setImagePreview] = useState<string | null>(user.photo || null)
+  const [imagePreview, setImagePreview] = useState(user.photo || null)
   const [isUploading, setIsUploading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -46,7 +39,7 @@ export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps
     setValue,
     reset,
     formState: { errors },
-  } = useForm<UpdateUserFormValues>({
+  } = useForm({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       first_name: user.first_name,
@@ -81,7 +74,7 @@ export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps
     }
   }, [user, open, reset])
 
-  const onSubmit = async (data: UpdateUserFormValues) => {
+  const onSubmit = async (data) => {
     setLoading(true)
     try {
       const result = await updateUser(user.id, data)
@@ -103,14 +96,14 @@ export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps
     setValue("photo", "")
   }
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     // Preview
     const reader = new FileReader()
     reader.onloadend = () => {
-      setImagePreview(reader.result as string)
+      setImagePreview(reader.result)
     }
     reader.readAsDataURL(file)
 
@@ -162,7 +155,7 @@ export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps
               </Label>
               <div className="flex flex-col gap-4">
                 {imagePreview ? (
-                  <div className="relative h-24 w-24 mx-auto sm:mx-0">
+                   <div className="relative h-24 w-24 mx-auto sm:mx-0">
                     <img
                       src={imagePreview}
                       alt="Preview"
@@ -224,7 +217,7 @@ export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gender</Label>
-                  <Select defaultValue={user.gender} onValueChange={(val) => setValue("gender", val as "Male" | "Female")}>
+                  <Select defaultValue={user.gender} onValueChange={(val) => setValue("gender", val)}>
                     <SelectTrigger className="bg-background/50">
                       <SelectValue placeholder="Select Gender" />
                     </SelectTrigger>
@@ -251,7 +244,7 @@ export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Select defaultValue={user.role} onValueChange={(val) => setValue("role", val as "Admin" | "Guard" | "Resident")}>
+                  <Select defaultValue={user.role} onValueChange={(val) => setValue("role", val)}>
                     <SelectTrigger className="bg-background/50">
                       <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
@@ -309,8 +302,6 @@ export function EditUserDialog({ user, open, onOpenChange }: EditUserDialogProps
                 )}
               </div>
             </div>
-
-
           </form>
         </div>
 

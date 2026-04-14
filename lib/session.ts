@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from "jose"
 
-const secretKey = process.env.BETTER_AUTH_SECRET || "default_secret_key_change_me"
+const secretKey = process.env.BETTER_AUTH_SECRET
 const key = new TextEncoder().encode(secretKey)
 
 export async function encrypt(payload: any) {

@@ -32,8 +32,9 @@ export async function POST(req: NextRequest) {
         room: user.room_assignment[0]?.room?.room_number ?? null,
       },
     })
-  } catch (e) {
+  } catch (e: any) {
     console.error("Mobile login error:", e)
-    return jsonError("Something went wrong. Please try again.", 500)
+    const msg = e?.message || "Something went wrong. Please try again."
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

@@ -1,7 +1,8 @@
 import { SignJWT, jwtVerify } from "jose"
 import { NextRequest, NextResponse } from "next/server"
 
-const key = new TextEncoder().encode(process.env.BETTER_AUTH_SECRET)
+const secret = process.env.BETTER_AUTH_SECRET || "dormitory-management-system-secret-key-fallback-2026"
+const key = new TextEncoder().encode(secret)
 
 export type MobileSession = { userId: string; role: string; username: string }
 

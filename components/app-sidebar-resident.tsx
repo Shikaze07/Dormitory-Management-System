@@ -151,8 +151,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#">
-                Logo
+              <a href="#" className="flex items-center gap-2">
+                <img src="/icon.png" alt="Logo" className="h-7 w-7 rounded-md object-contain" />
                 <span className="text-base font-semibold">Dormitory Management</span>
               </a>
             </SidebarMenuButton>

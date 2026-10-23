@@ -42,6 +42,7 @@ export type VisitorRequest = {
   visitor: {
     id: string
     first_name: string
+    middle_name?: string | null
     last_name: string
     gender: string
     qr_code: string
@@ -166,6 +167,7 @@ export const columns: ColumnDef<VisitorRequest>[] = [
     cell: ({ row }) => {
       const request = row.original
       const [showCancelDialog, setShowCancelDialog] = useState(false)
+      const [showDetailsDialog, setShowDetailsDialog] = useState(false)
       const [isLoading, setIsLoading] = useState(false)
 
       const handleCancel = async () => {
@@ -180,6 +182,14 @@ export const columns: ColumnDef<VisitorRequest>[] = [
         }
       }
 
+      const fullName = [
+        request.visitor.first_name,
+        request.visitor.middle_name,
+        request.visitor.last_name,
+      ]
+        .filter(Boolean)
+        .join(" ")
+
       return (
         <>
           <DropdownMenu>
@@ -191,11 +201,7 @@ export const columns: ColumnDef<VisitorRequest>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => {
-                  toast.info("Detailed view coming soon")
-                }}
-              >
+              <DropdownMenuItem onClick={() => setShowDetailsDialog(true)}>
                 <FileText className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
@@ -213,6 +219,53 @@ export const columns: ColumnDef<VisitorRequest>[] = [
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Visitor Request Details</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="grid grid-cols-2 gap-3 p-4 rounded-lg bg-muted/40 border text-sm">
+                  <div>
+                    <span className="text-xs text-muted-foreground block">Visitor Name</span>
+                    <span className="font-semibold text-foreground">{fullName}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted-foreground block">Gender</span>
+                    <span className="font-semibold text-foreground">{request.visitor.gender || "N/A"}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted-foreground block">Status</span>
+                    <Badge variant="outline" className="mt-0.5 font-medium">
+                      {request.status}
+                    </Badge>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted-foreground block">Expected Visit</span>
+                    <span className="font-semibold text-foreground">
+                      {format(new Date(request.expected_at), "MMM dd, yyyy")}
+                    </span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-xs text-muted-foreground block">Pass Expiration</span>
+                    <span className="font-medium text-foreground">
+                      {format(new Date(request.visitor.qr_expires_at), "MMM dd, yyyy hh:mm a")}
+                    </span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-xs text-muted-foreground block">Purpose of Visit</span>
+                    <p className="mt-1 text-foreground leading-relaxed">
+                      {request.purpose || "No specific purpose provided."}
+                    </p>
+                  </div>
+                  <div className="col-span-2 text-xs text-muted-foreground pt-1 border-t">
+                    Registered on {format(new Date(request.created_at), "MMM dd, yyyy hh:mm a")}
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <ConfirmationDialog
             open={showCancelDialog}

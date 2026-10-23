@@ -19,6 +19,17 @@ export async function POST(req: NextRequest) {
     })
     if (user) {
       if (!user.is_active) return jsonError("User account is deactivated.")
+
+      if (accessType === "CheckOut") {
+        const lastLog = await prisma.accessLog.findFirst({
+          where: { user_id: user.id },
+          orderBy: { timestamp: "desc" },
+        })
+        if (!lastLog || lastLog.access_type !== "CheckIn") {
+          return jsonError("Cannot check out. Resident has not checked in yet.", 400)
+        }
+      }
+
       const log = await prisma.accessLog.create({
         data: { user_id: user.id, access_type: accessType, scanned_by_id: session.userId },
       })
@@ -40,6 +51,17 @@ export async function POST(req: NextRequest) {
       if (new Date() > new Date(visitor.qr_expires_at)) return jsonError("Visitor pass has expired.")
       const status = visitor.visit_request?.status
       if (status === "Rejected" || status === "Cancelled") return jsonError(`Visit request was ${status.toLowerCase()}.`)
+
+      if (accessType === "CheckOut") {
+        const lastLog = await prisma.accessLog.findFirst({
+          where: { visitor_id: visitor.id },
+          orderBy: { timestamp: "desc" },
+        })
+        if (!lastLog || lastLog.access_type !== "CheckIn") {
+          return jsonError("Cannot check out. Visitor has not checked in yet.", 400)
+        }
+      }
+
       const log = await prisma.accessLog.create({
         data: { visitor_id: visitor.id, access_type: accessType, scanned_by_id: session.userId },
       })

@@ -24,6 +24,8 @@ import {
   ArrowUpRight,
   BedDouble,
   BookOpen,
+  Download,
+  Smartphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -149,11 +151,10 @@ export default function DormitoryLandingPage() {
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-foreground selection:text-background">
       {/* Top Navbar */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
             ? 'bg-background/85 backdrop-blur-md border-b border-border shadow-xs'
             : 'bg-transparent'
-        }`}
+          }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand */}
@@ -176,7 +177,7 @@ export default function DormitoryLandingPage() {
                 Dormitory System
               </span>
               <span className="text-[11px] font-medium text-muted-foreground block -mt-0.5">
-                Modern Campus Living
+
               </span>
             </div>
           </button>
@@ -211,6 +212,16 @@ export default function DormitoryLandingPage() {
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-3">
+            <a href="/dormitory.apk" download="dormitory.apk">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full px-4 font-semibold border-border hover:bg-muted"
+              >
+                <Download className="mr-1.5 h-3.5 w-3.5 text-foreground" />
+                Download App
+              </Button>
+            </a>
             <Link href="/login">
               <Button
                 variant="default"
@@ -262,7 +273,13 @@ export default function DormitoryLandingPage() {
                 Contact
               </button>
             </div>
-            <div className="pt-2">
+            <div className="pt-2 flex flex-col gap-2">
+              <a href="/dormitory.apk" download="dormitory.apk" className="w-full">
+                <Button variant="outline" className="w-full rounded-full font-semibold">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Mobile App (.APK)
+                </Button>
+              </a>
               <Link href="/login" className="block w-full">
                 <Button className="w-full rounded-full font-semibold">
                   Log In
@@ -303,11 +320,21 @@ export default function DormitoryLandingPage() {
                     <ArrowUpRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
+                <a href="/dormitory.apk" download="dormitory.apk" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="h-12 rounded-full px-7 font-semibold w-full hover:bg-muted/60"
+                  >
+                    <Smartphone className="mr-2 h-4 w-4 text-foreground" />
+                    Download Mobile App
+                  </Button>
+                </a>
                 <Button
                   size="lg"
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => scrollTo('rooms')}
-                  className="h-12 rounded-full px-8 w-full sm:w-auto hover:bg-muted/60"
+                  className="h-12 rounded-full px-6 w-full sm:w-auto hover:bg-muted/60"
                 >
                   Explore Rooms
                 </Button>
@@ -581,16 +608,19 @@ export default function DormitoryLandingPage() {
                   Already registered? Sign in to manage your room assignment, scan logs, and visitor requests.
                 </p>
 
-                <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center">
+                <div className="mt-8 flex flex-col sm:flex-row gap-3 items-center">
                   <Link href="/login" className="w-full sm:w-auto">
                     <Button size="lg" className="rounded-full px-8 font-semibold w-full">
                       Proceed to Log In
                       <ArrowUpRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <span className="text-xs text-muted-foreground text-center sm:text-left">
-                    Direct access for Residents, Security Guards, and Dormitory Administrators.
-                  </span>
+                  <a href="/dormitory.apk" download="dormitory.apk" className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="rounded-full px-6 font-semibold w-full">
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Android App
+                    </Button>
+                  </a>
                 </div>
               </div>
             </div>

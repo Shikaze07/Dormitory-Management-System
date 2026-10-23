@@ -81,12 +81,7 @@ export function LoginForm({
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
+
                 </div>
                 <Input
                   id="password"
@@ -110,9 +105,7 @@ export function LoginForm({
               </Field>
 
 
-              <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="#">Sign up</a>
-              </FieldDescription>
+
             </FieldGroup>
           </form>
           <div className="relative hidden bg-muted md:block">

@@ -1,9 +1,16 @@
 import { getResidentProfile } from "@/lib/actions/user-actions"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Calendar, Mail, MapPin, QrCode, Shield, Info } from "lucide-react"
+import { User, Calendar, Mail, MapPin, QrCode, Shield, Info, UserCircle } from "lucide-react"
 import { QRCodeCell } from "@/components/shared/qr-code-cell"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { format } from "date-fns"
 
 export default async function ResidentProfilePage() {
@@ -45,13 +52,36 @@ export default async function ResidentProfilePage() {
         {/* Personal Information */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={user.photo || undefined} alt={`${user.first_name} ${user.last_name}`} />
-                <AvatarFallback className="text-xl">
-                  {user.first_name[0]}{user.last_name[0]}
-                </AvatarFallback>
-              </Avatar>
+            <div className="flex items-center gap-3">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-primary/10">
+                    <AvatarImage src={user.photo || undefined} alt={`${user.first_name} ${user.last_name}`} />
+                    <AvatarFallback className="text-xl">
+                      {user.first_name[0]}{user.last_name[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>{user.first_name} {user.last_name}</DialogTitle>
+                  </DialogHeader>
+                  <div className="flex items-center justify-center p-4">
+                    {user.photo ? (
+                      <img
+                        src={user.photo}
+                        alt={`${user.first_name} ${user.last_name}`}
+                        className="max-h-[70vh] w-full object-contain rounded-lg border"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-muted-foreground py-12">
+                        <UserCircle className="h-20 w-20 opacity-20" />
+                        <p>No photo available</p>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
               <div>
                 <CardTitle className="text-2xl">{user.first_name} {user.last_name}</CardTitle>
                 <CardDescription>Resident</CardDescription>
@@ -96,11 +126,28 @@ export default async function ResidentProfilePage() {
             <CardDescription>Your personal QR code for entry and exit.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center py-6">
-            <div className="bg-white p-4 rounded-xl border shadow-sm">
-              <QRCodeCell value={user.qr_code} size={180} />
-            </div>
-            <p className="mt-4 text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded">
-            </p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="bg-white p-4 rounded-xl border shadow-sm cursor-pointer hover:opacity-85 hover:shadow-md transition-all">
+                  <QRCodeCell value={user.qr_code} size={180} />
+                </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Personal Access Badge</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col items-center justify-center p-6 gap-4">
+                  <div className="bg-white p-6 rounded-2xl border-4 border-primary/10 shadow-xl">
+                    <QRCodeCell value={user.qr_code} size={250} />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold">{user.first_name} {user.last_name}</p>
+                    <p className="text-xs text-muted-foreground font-mono mt-0.5">{user.qr_code}</p>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <p className="mt-3 text-xs text-muted-foreground">Click to enlarge QR</p>
           </CardContent>
         </Card>
 

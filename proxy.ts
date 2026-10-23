@@ -64,8 +64,6 @@ function getHomeRoute(role: string): string {
     case 'Resident':
       return '/resident/profile'
     case 'Guard':
-      // Currently no specific guard route, redirecting to a neutral place or login
-      return '/login'
     default:
       return '/login'
   }

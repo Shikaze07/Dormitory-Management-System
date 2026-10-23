@@ -17,6 +17,8 @@ import {
   IconSearch,
 
   IconSettings,
+  IconUserPlus,
+  IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
 import { LogOutIcon } from "lucide-react"
@@ -45,19 +47,14 @@ const data = {
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
-    {
       title: "Visitor Requests",
       url: "/resident/visitor-requests",
-      icon: IconListDetails,
+      icon: IconUserPlus,
     },
     {
       title: "My Profile",
       url: "/resident/profile",
-      icon: IconChartBar,
+      icon: IconUserCircle,
     },
   ],
   navClouds: [

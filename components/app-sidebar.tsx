@@ -66,7 +66,7 @@ const data = {
     },
     {
       title: "Access Logs",
-      url: "#",
+      url: "/admin/access-logs",
       icon: IconUsers,
     },
   ],

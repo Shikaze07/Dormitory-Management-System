@@ -16,7 +16,7 @@ import {
   Trash2, 
   Calendar,
   DoorOpen,
-  User as UserIcon,
+  UserCircle,
   CheckCircle2,
   XCircle
 } from "lucide-react"
@@ -68,37 +68,36 @@ export const columns = [
 
       return (
         <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9 border shadow-sm">
-             <Dialog>
-              <DialogTrigger asChild>
-                <div className="cursor-pointer hover:opacity-80 transition-opacity">
-                  <AvatarImage src={user.photo || undefined} />
-                  <AvatarFallback className="bg-primary/5 text-primary text-xs">
-                    {user.first_name[0]}{user.last_name[0]}
-                  </AvatarFallback>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>{user.first_name} {user.last_name}</DialogTitle>
-                </DialogHeader>
-                <div className="flex items-center justify-center p-4">
-                  {user.photo ? (
-                    <img
-                      src={user.photo}
-                      alt={`${user.first_name} ${user.last_name}`}
-                      className="max-h-[70vh] w-full object-contain rounded-lg border shadow-lg"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground py-12">
-                      <UserIcon className="h-20 w-20 opacity-20" />
-                      <p>No photo available</p>
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </Avatar>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Avatar className="h-10 w-10 cursor-pointer hover:opacity-80 transition-opacity">
+                <AvatarImage src={user.photo || undefined} alt={user.first_name} />
+                <AvatarFallback>
+                  {user.first_name[0]}
+                  {user.last_name[0]}
+                </AvatarFallback>
+              </Avatar>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>{user.first_name} {user.last_name}</DialogTitle>
+              </DialogHeader>
+              <div className="flex items-center justify-center p-4">
+                {user.photo ? (
+                  <img
+                    src={user.photo}
+                    alt={user.first_name}
+                    className="max-h-[70vh] w-full object-contain rounded-lg border"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground py-12">
+                    <UserCircle className="h-20 w-20 opacity-20" />
+                    <p>No photo available</p>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
           <div className="flex flex-col">
             <span className="font-medium text-sm">
               {user.first_name} {user.last_name}

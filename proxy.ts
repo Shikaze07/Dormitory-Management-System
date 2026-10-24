@@ -60,7 +60,7 @@ export default async function proxy(request: NextRequest) {
 function getHomeRoute(role: string): string {
   switch (role) {
     case 'Admin':
-      return '/admin/user-management'
+      return '/admin/dashboard'
     case 'Resident':
       return '/resident/profile'
     case 'Guard':

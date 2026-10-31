@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     requests: requests.map((r) => ({
       id: r.id,
-      name: `${r.visitor.first_name} ${r.visitor.last_name}`,
+      name: [r.visitor.first_name, r.visitor.middle_name, r.visitor.last_name].filter(Boolean).join(" "),
       purpose: r.purpose,
       expected_at: r.expected_at,
       status: r.status,

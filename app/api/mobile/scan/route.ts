@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}))
   const token = String(body.token || "").trim()
   const accessType = body.accessType === "CheckOut" ? "CheckOut" : "CheckIn"
+  const mode = body.mode === "preview" ? "preview" : body.mode === "reject" ? "reject" : "record"
   if (!token) return jsonError("QR code is required.")
 
   try {
@@ -53,6 +54,30 @@ export async function POST(req: NextRequest) {
       const status = visitor.visit_request?.status
       if (status === "Rejected" || status === "Cancelled") return jsonError(`Visit request was ${status.toLowerCase()}.`)
 
+      const host = visitor.visit_request?.resident
+      const hostAssignment = host
+        ? await prisma.roomAssignment.findFirst({
+            where: { user_id: host.id, is_active: true },
+            include: { room: true },
+          })
+        : null
+      const hostRoom = hostAssignment?.room?.room_number ?? null
+
+      if (mode === "reject") {
+        if (visitor.visit_request) {
+          await prisma.visitorRequest.update({
+            where: { id: visitor.visit_request.id },
+            data: { status: "Rejected" },
+          })
+        }
+        return NextResponse.json({
+          success: true,
+          rejected: true,
+          type: "Visitor",
+          name: `${visitor.first_name} ${visitor.last_name}`,
+        })
+      }
+
       if (accessType === "CheckOut") {
         const lastLog = await prisma.accessLog.findFirst({
           where: { visitor_id: visitor.id },
@@ -61,6 +86,22 @@ export async function POST(req: NextRequest) {
         if (!lastLog || lastLog.access_type !== "CheckIn") {
           return jsonError("Cannot check out. Visitor has not checked in yet.", 400)
         }
+      }
+
+      if (mode === "preview") {
+        return NextResponse.json({
+          success: true,
+          preview: true,
+          type: "Visitor",
+          name: `${visitor.first_name} ${visitor.last_name}`,
+          photo: visitor.photo ?? null,
+          visiting: host ? `${host.first_name} ${host.last_name}` : null,
+          host_room: hostRoom,
+          purpose: visitor.visit_request?.purpose ?? null,
+          visit_duration_seconds: visitor.visit_duration_seconds ?? null,
+          expected_at: visitor.visit_request?.expected_at ?? null,
+          accessType,
+        })
       }
 
       const log = await prisma.accessLog.create({
@@ -72,14 +113,6 @@ export async function POST(req: NextRequest) {
           data: { status: "Approved" },
         })
       }
-      const host = visitor.visit_request?.resident
-      const hostAssignment = host
-        ? await prisma.roomAssignment.findFirst({
-            where: { user_id: host.id, is_active: true },
-            include: { room: true },
-          })
-        : null
-      const hostRoom = hostAssignment?.room?.room_number ?? null
       return NextResponse.json({
         success: true,
         type: "Visitor",

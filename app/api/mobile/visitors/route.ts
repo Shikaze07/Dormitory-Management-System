@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
   if (!first || !last) return jsonError("First and last name are required.")
   if (isNaN(expected.getTime())) return jsonError("Invalid expected date.")
 
+  const secs = Math.round(Number(b.visit_duration_seconds)) || null
+  const photo = String(b.photo || "").trim() || null
+
   try {
     await prisma.$transaction(async (tx) => {
       const visitor = await tx.visitor.create({
@@ -47,6 +50,8 @@ export async function POST(req: NextRequest) {
           middle_name: middle || null,
           last_name: last,
           gender,
+          photo,
+          visit_duration_seconds: secs,
           qr_code: `VISIT-${randomUUID()}`,
           qr_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
         },

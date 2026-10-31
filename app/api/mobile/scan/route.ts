@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         type: "Resident",
+        photo: user.photo ?? null,
         name: `${user.first_name} ${user.last_name}`,
         detail: `Room ${user.room_assignment[0]?.room?.room_number ?? "Unassigned"}`,
         accessType,
@@ -72,9 +73,21 @@ export async function POST(req: NextRequest) {
         })
       }
       const host = visitor.visit_request?.resident
+      const hostAssignment = host
+        ? await prisma.roomAssignment.findFirst({
+            where: { user_id: host.id, is_active: true },
+            include: { room: true },
+          })
+        : null
+      const hostRoom = hostAssignment?.room?.room_number ?? null
       return NextResponse.json({
         success: true,
         type: "Visitor",
+        photo: visitor.photo ?? null,
+        visiting: host ? `${host.first_name} ${host.last_name}` : null,
+        host_room: hostRoom,
+        purpose: visitor.visit_request?.purpose ?? null,
+        visit_duration_seconds: visitor.visit_duration_seconds ?? null,
         name: `${visitor.first_name} ${visitor.last_name}`,
         detail: `Visiting ${host ? `${host.first_name} ${host.last_name}` : "N/A"} • ${
           visitor.visit_request?.purpose || "Personal Visit"

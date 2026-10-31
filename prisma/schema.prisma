@@ -47,6 +47,9 @@ model User {
   dob         DateTime
   gender      Gender
   username    String   @unique
+  email       String?
+  phone       String?
+  address     String?
   password    String
   qr_code     String   @unique
   role        Role
@@ -94,6 +97,8 @@ model Visitor {
   gender        Gender
   qr_code       String   @unique
   qr_expires_at DateTime
+  photo         String?
+  visit_duration_seconds Int?
   created_at    DateTime @default(now())
 
   visit_request VisitorRequest?

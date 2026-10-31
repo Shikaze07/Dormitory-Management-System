@@ -98,6 +98,9 @@ export const columns = [
     accessorKey: "username",
     header: "Username",
   },
+  { accessorKey: "email", header: "Email" },
+  { accessorKey: "phone", header: "Phone" },
+  { accessorKey: "address", header: "Address" },
   {
     accessorKey: "role",
     header: "Role",

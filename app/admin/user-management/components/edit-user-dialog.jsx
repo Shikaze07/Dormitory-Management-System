@@ -48,6 +48,9 @@ export function EditUserDialog({ user, open, onOpenChange }) {
       dob: new Date(user.dob).toISOString().split("T")[0],
       gender: user.gender,
       username: user.username,
+      email: user.email || "",
+      phone: user.phone || "",
+      address: user.address || "",
       role: user.role,
       photo: user.photo || "",
       password: "", // Password remains empty unless changed
@@ -65,6 +68,9 @@ export function EditUserDialog({ user, open, onOpenChange }) {
         dob: new Date(user.dob).toISOString().split("T")[0],
         gender: user.gender,
         username: user.username,
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || "",
         role: user.role,
         photo: user.photo || "",
         password: "",
@@ -203,6 +209,10 @@ export function EditUserDialog({ user, open, onOpenChange }) {
                   {errors.first_name && <p className="text-xs text-destructive">{errors.first_name.message}</p>}
                 </div>
                 <div className="space-y-2">
+<Label htmlFor="middle_name">Middle Name (Optional)</Label>
+<Input id="middle_name" {...register("middle_name")} placeholder="Michael" className="bg-background/50" />
+</div>
+<div className="space-y-2">
                   <Label htmlFor="last_name">Last Name</Label>
                   <Input id="last_name" {...register("last_name")} placeholder="Doe" className="bg-background/50" />
                   {errors.last_name && <p className="text-xs text-destructive">{errors.last_name.message}</p>}
@@ -212,7 +222,7 @@ export function EditUserDialog({ user, open, onOpenChange }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="dob">Date of Birth</Label>
-                  <Input id="dob" type="date" {...register("dob")} className="bg-background/50" />
+                  <Input id="dob" max={new Date().toISOString().split("T")[0]} type="date" {...register("dob")} className="bg-background/50" />
                   {errors.dob && <p className="text-xs text-destructive">{errors.dob.message}</p>}
                 </div>
                 <div className="space-y-2">
@@ -257,6 +267,23 @@ export function EditUserDialog({ user, open, onOpenChange }) {
                   {errors.role && <p className="text-xs text-destructive">{errors.role.message}</p>}
                 </div>
               </div>
+
+              <div className="space-y-2">
+<Label htmlFor="email">Email</Label>
+<Input id="email" type="email" {...register("email")} placeholder="john@gmail.com" className="bg-background/50" />
+{errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+</div>
+<div className="space-y-2">
+<Label htmlFor="phone">Phone</Label>
+<Input id="phone" inputMode="numeric" maxLength={11} {...register("phone")} placeholder="09123456789" className="bg-background/50" />
+{errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+</div>
+<div className="space-y-2">
+<Label htmlFor="address">Address</Label>
+<Input id="address" {...register("address")} placeholder="Street, City" className="bg-background/50" />
+{errors.address && <p className="text-xs text-destructive">{errors.address.message}</p>}
+</div>
+
 
               <div className="space-y-2">
                 <Label htmlFor="password">Password (Optional)</Label>

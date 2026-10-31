@@ -47,10 +47,20 @@ export type VisitorRequest = {
     gender: string
     qr_code: string
     qr_expires_at: Date
+    photo?: string | null
+    visit_duration_seconds?: number | null
   }
 }
 
 export const columns: ColumnDef<VisitorRequest>[] = [
+  {
+    id: "photo",
+    header: "Photo",
+    cell: ({ row }) => row.original.visitor.photo ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={row.original.visitor.photo} alt="Visitor" className="h-9 w-9 rounded-full object-cover border" />
+    ) : <span className="text-muted-foreground">?</span>,
+  },
   {
     accessorFn: (row) => `${row.visitor.first_name} ${row.visitor.last_name}`,
     id: "visitor",
@@ -70,6 +80,16 @@ export const columns: ColumnDef<VisitorRequest>[] = [
     cell: ({ row }) => {
       return format(new Date(row.getValue("expected_at")), "MMM dd, yyyy")
     }
+  },
+  {
+    id: "duration",
+    header: "Duration",
+    cell: ({ row }) => {
+      const s = row.original.visitor.visit_duration_seconds
+      if (!s) return <span className="text-muted-foreground">?</span>
+      const p = (n: number) => String(n).padStart(2, "0")
+      return `${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)}`
+    },
   },
   {
     accessorKey: "status",

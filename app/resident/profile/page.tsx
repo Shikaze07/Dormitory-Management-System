@@ -1,7 +1,7 @@
 import { getResidentProfile } from "@/lib/actions/user-actions"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Calendar, Mail, MapPin, QrCode, Shield, Info, UserCircle } from "lucide-react"
+import { User, Calendar, Mail, Phone, Home, MapPin, QrCode, Shield, Info, UserCircle } from "lucide-react"
 import { QRCodeCell } from "@/components/shared/qr-code-cell"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -33,8 +33,8 @@ export default async function ResidentProfilePage() {
   const roomInfo = user.room_assignment[0]?.room
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between">
+    <div className="flex-1 space-y-4 p-8 pt-2">
+      {/* <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-primary mb-1">
             <User className="h-6 w-6" />
@@ -44,9 +44,9 @@ export default async function ResidentProfilePage() {
             View and manage your personal information and dormitory details.
           </p>
         </div>
-      </div>
+      </div> */}
 
-      <Separator className="my-6" />
+      {/* <Separator className="my-6" /> */}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Personal Information */}
@@ -83,7 +83,7 @@ export default async function ResidentProfilePage() {
                 </DialogContent>
               </Dialog>
               <div>
-                <CardTitle className="text-2xl">{user.first_name} {user.last_name}</CardTitle>
+                <CardTitle className="text-2xl">{[user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" ")}</CardTitle>
                 <CardDescription>Resident</CardDescription>
               </div>
             </div>
@@ -109,6 +109,27 @@ export default async function ResidentProfilePage() {
                 <div>
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Username</p>
                   <p className="font-medium">{user.username}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Mail className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Email</p>
+                  <p className="font-medium">{user.email || "?"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Phone className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Phone</p>
+                  <p className="font-medium">{user.phone || "?"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Home className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Address</p>
+                  <p className="font-medium">{user.address || "?"}</p>
                 </div>
               </div>
 

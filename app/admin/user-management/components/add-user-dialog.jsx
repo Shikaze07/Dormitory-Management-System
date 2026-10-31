@@ -130,7 +130,7 @@ export function AddUserDialog() {
           Add User
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] flex flex-col gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[500px] flex  flex-col gap-0 overflow-hidden">
         {qrCodeDataUrl ? (
           <div className="flex flex-col items-center gap-4 py-8 text-center">
             <DialogHeader>
@@ -161,7 +161,7 @@ export function AddUserDialog() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex-1 overflow-y-auto pr-2 max-h-[60vh] -mr-2">
+            <div className="flex-1 overflow-y-auto p-2 pr-2 max-h-[60vh] -mr-2">
               <form id="add-user-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-4">
                 <div className="space-y-3">
                   <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 flex items-center gap-2">
@@ -218,6 +218,10 @@ export function AddUserDialog() {
                       {errors.first_name && <p className="text-xs text-destructive">{errors.first_name.message}</p>}
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="middle_name">Middle Name (Optional)</Label>
+                      <Input id="middle_name" {...register("middle_name")} placeholder="Cruz" className="bg-background/50" />
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="last_name">Last Name</Label>
                       <Input id="last_name" {...register("last_name")} placeholder="Doe" className="bg-background/50" />
                       {errors.last_name && <p className="text-xs text-destructive">{errors.last_name.message}</p>}
@@ -227,7 +231,7 @@ export function AddUserDialog() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="dob">Date of Birth</Label>
-                      <Input id="dob" type="date" {...register("dob")} className="bg-background/50" />
+                      <Input id="dob" max={new Date().toISOString().split("T")[0]} type="date" {...register("dob")} className="bg-background/50" />
                       {errors.dob && <p className="text-xs text-destructive">{errors.dob.message}</p>}
                     </div>
                     <div className="space-y-2">
@@ -272,6 +276,23 @@ export function AddUserDialog() {
                       {errors.role && <p className="text-xs text-destructive">{errors.role.message}</p>}
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" {...register("email")} placeholder="john@gmail.com" className="bg-background/50" />
+                    {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input id="phone" inputMode="numeric" maxLength={11} {...register("phone")} placeholder="09123456789" className="bg-background/50" />
+                    {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input id="address" {...register("address")} placeholder="Street, City" className="bg-background/50" />
+                    {errors.address && <p className="text-xs text-destructive">{errors.address.message}</p>}
+                  </div>
+
 
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>

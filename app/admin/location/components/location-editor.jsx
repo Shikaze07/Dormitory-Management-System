@@ -40,33 +40,18 @@ export function LocationEditor({ initial }) {
     if (!navigator.geolocation) return toast.error("Geolocation is not supported by this browser.")
     if (locating) return
     setLocating(true)
-    let best = null
-    const GOOD_ENOUGH = 25 // meters
-    const MAX_WAIT = 20000 // ms
-    let watchId = null
-    let timer = null
-
-    const finish = () => {
-      navigator.geolocation.clearWatch(watchId)
-      clearTimeout(timer)
-      setLocating(false)
-      if (!best) return toast.error("Could not get your location. Allow location access or click the map.")
-      pick(best.coords.latitude, best.coords.longitude)
-      toast.success("Pinned your location. Drag the pin or click the map to adjust it.")
-    }
-
-    watchId = navigator.geolocation.watchPosition(
+    navigator.geolocation.getCurrentPosition(
       (p) => {
-        if (!best || p.coords.accuracy < best.coords.accuracy) {
-          best = p
-          pick(p.coords.latitude, p.coords.longitude)
-        }
-        if (p.coords.accuracy <= GOOD_ENOUGH) finish()
+        pick(p.coords.latitude, p.coords.longitude)
+        setLocating(false)
+        toast.success("Pinned your location. Drag the pin or click the map to adjust it.")
       },
-      () => finish(),
-      { enableHighAccuracy: true, timeout: MAX_WAIT, maximumAge: 0 }
+      () => {
+        setLocating(false)
+        toast.error("Could not get your location. Allow location access or click the map.")
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     )
-    timer = setTimeout(finish, MAX_WAIT)
   }
 
   const save = async () => {

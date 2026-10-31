@@ -44,7 +44,10 @@ export async function POST(req: NextRequest) {
         return jsonError("Location unavailable. Turn on GPS and allow location access to scan.", 403)
       }
       const dist = Math.round(distanceMeters(lat, lng, area.latitude, area.longitude))
-      if (dist > area.radius_meters) {
+      // Allow for GPS error, but never more than 50 m of slack.
+      const acc = Number(body.accuracy)
+      const slack = Number.isFinite(acc) && acc > 0 ? Math.min(acc, 50) : 0
+      if (dist - slack > area.radius_meters) {
         return jsonError(
           `You are outside the dorm area (${dist.toLocaleString()} m away, allowed ${area.radius_meters.toLocaleString()} m). Move inside the area to scan.`,
           403

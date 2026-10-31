@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useMemo, useState } from "react"
 import dynamic from "next/dynamic"
@@ -28,6 +28,8 @@ export function LocationEditor({ initial }) {
   const [unit, setUnit] = useState("m")
   const [value, setValue] = useState(initial ? String(initial.radius_meters) : "500")
   const [saving, setSaving] = useState(false)
+  const [locating, setLocating] = useState(false)
+  const [accuracy, setAccuracy] = useState(null)
   const [saved, setSaved] = useState(initial)
 
   const radius = useMemo(() => Math.round(toMeters(value, unit)), [value, unit])
@@ -37,11 +39,45 @@ export function LocationEditor({ initial }) {
 
   const useMyLocation = () => {
     if (!navigator.geolocation) return toast.error("Geolocation is not supported by this browser.")
-    navigator.geolocation.getCurrentPosition(
-      (p) => pick(p.coords.latitude, p.coords.longitude),
-      () => toast.error("Could not get your location. Allow location access or click the map."),
-      { enableHighAccuracy: true, timeout: 10000 }
+    if (locating) return
+    setLocating(true)
+    setAccuracy(null)
+    let best = null
+    const GOOD_ENOUGH = 25 // meters
+    const MAX_WAIT = 20000 // ms
+    let watchId = null
+    let timer = null
+
+    const finish = () => {
+      navigator.geolocation.clearWatch(watchId)
+      clearTimeout(timer)
+      setLocating(false)
+      if (!best) return toast.error("Could not get your location. Allow location access or click the map.")
+      pick(best.coords.latitude, best.coords.longitude)
+      const acc = Math.round(best.coords.accuracy)
+      setAccuracy(acc)
+      if (acc > 100) {
+        toast.warning(
+          `Location is only accurate to about ${acc.toLocaleString()} m. This device has no GPS (common on laptops/PCs). Click the exact spot on the map or use a phone for a precise pin.`
+        )
+      } else {
+        toast.success(`Pinned your location (accurate to about ${acc} m).`)
+      }
+    }
+
+    watchId = navigator.geolocation.watchPosition(
+      (p) => {
+        if (!best || p.coords.accuracy < best.coords.accuracy) {
+          best = p
+          pick(p.coords.latitude, p.coords.longitude)
+          setAccuracy(Math.round(p.coords.accuracy))
+        }
+        if (p.coords.accuracy <= GOOD_ENOUGH) finish()
+      },
+      () => finish(),
+      { enableHighAccuracy: true, timeout: MAX_WAIT, maximumAge: 0 }
     )
+    timer = setTimeout(finish, MAX_WAIT)
   }
 
   const save = async () => {
@@ -107,9 +143,16 @@ export function LocationEditor({ initial }) {
           </div>
         </div>
 
-        <Button type="button" variant="outline" className="w-full gap-2" onClick={useMyLocation}>
-          <LocateFixed className="h-4 w-4" /> Use my current location
+        <Button type="button" variant="outline" className="w-full gap-2" onClick={useMyLocation} disabled={locating}>
+          {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
+          {locating ? "Getting precise location..." : "Use my current location"}
         </Button>
+        {accuracy != null && (
+          <p className={`text-xs ${accuracy > 100 ? "text-amber-600" : "text-muted-foreground"}`}>
+            Accuracy: about {accuracy.toLocaleString()} m
+            {accuracy > 100 ? " — too rough; click the exact spot on the map instead." : ""}
+          </p>
+        )}
 
         <Button type="button" className="w-full gap-2" onClick={save} disabled={saving}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}

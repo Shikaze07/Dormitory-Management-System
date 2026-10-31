@@ -13,6 +13,7 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconListDetails,
+  IconMapPin,
   IconReport,
   IconSearch,
   IconSettings,
@@ -68,6 +69,11 @@ const data = {
       title: "Access Logs",
       url: "/admin/access-logs",
       icon: IconUsers,
+    },
+    {
+      title: "Set Location",
+      url: "/admin/location",
+      icon: IconMapPin,
     },
   ],
   navClouds: [

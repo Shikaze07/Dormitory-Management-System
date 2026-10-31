@@ -21,6 +21,9 @@ export async function GET(req: NextRequest) {
       status: r.status,
       qr_code: r.visitor.qr_code,
       qr_expires_at: r.visitor.qr_expires_at,
+      photo: r.visitor.photo,
+      visit_duration_seconds: r.visitor.visit_duration_seconds,
+      gender: r.visitor.gender,
     })),
   })
 }
@@ -36,11 +39,19 @@ export async function POST(req: NextRequest) {
   const last = String(b.last_name || "").trim()
   const gender = b.gender === "Female" ? "Female" : "Male"
   const expected = new Date(b.expected_at)
-  if (!first || !last) return jsonError("First and last name are required.")
+  if (first.length < 2) return jsonError("First name must be at least 2 characters.")
+  if (last.length < 2) return jsonError("Last name must be at least 2 characters.")
   if (isNaN(expected.getTime())) return jsonError("Invalid expected date.")
+  const today = new Date().toISOString().slice(0, 10)
+  if (String(b.expected_at).slice(0, 10) < today) return jsonError("Expected date cannot be in the past.")
 
-  const secs = Math.round(Number(b.visit_duration_seconds)) || null
-  const photo = String(b.photo || "").trim() || null
+  const purposeText = String(b.purpose || "").trim()
+  if (purposeText.length < 5) return jsonError("Purpose must be at least 5 characters.")
+  const secs = Math.round(Number(b.visit_duration_seconds)) || 0
+  if (secs <= 0) return jsonError("Visit duration must be greater than 0.")
+  if (secs > 86400) return jsonError("Visit duration cannot exceed 24 hours.")
+  const photo = String(b.photo || "").trim()
+  if (!photo) return jsonError("Visitor photo is required.")
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -60,7 +71,7 @@ export async function POST(req: NextRequest) {
         data: {
           resident_id: session.userId,
           visitor_id: visitor.id,
-          purpose: String(b.purpose || "").trim() || null,
+          purpose: purposeText,
           expected_at: expected,
           status: "Pending",
         },

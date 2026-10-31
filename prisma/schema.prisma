@@ -136,3 +136,10 @@ model AccessLog {
   @@index([visitor_id])
   @@index([timestamp])
 }
+model DormLocation {
+  id            Int      @id @default(1)
+  latitude      Float
+  longitude     Float
+  radius_meters Int
+  updated_at    DateTime @updatedAt
+}

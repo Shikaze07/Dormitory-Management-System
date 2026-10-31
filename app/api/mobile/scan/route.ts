@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { getMobileSession, jsonError } from "@/lib/mobile-auth"
+import { distanceMeters } from "@/lib/geo"
+
+function alreadyScanned(
+  visitor: { first_name: string; last_name: string; photo?: string | null },
+  previousType: string,
+  at: Date
+) {
+  const when = new Date(at).toLocaleString("en-PH", { timeZone: "Asia/Manila" })
+  const action = previousType === "CheckOut" ? "checked out" : "checked in"
+  return NextResponse.json(
+    {
+      error: `ALREADY SCANNED: ${visitor.first_name} ${visitor.last_name} was already ${action} on ${when}.`,
+      alreadyScanned: true,
+      name: `${visitor.first_name} ${visitor.last_name}`,
+      photo: visitor.photo ?? null,
+      previousType,
+      scannedAt: at,
+    },
+    { status: 409 }
+  )
+}
 
 export async function POST(req: NextRequest) {
   const session = await getMobileSession(req)
@@ -12,6 +33,25 @@ export async function POST(req: NextRequest) {
   const accessType = body.accessType === "CheckOut" ? "CheckOut" : "CheckIn"
   const mode = body.mode === "preview" ? "preview" : body.mode === "reject" ? "reject" : "record"
   if (!token) return jsonError("QR code is required.")
+
+  // Guards may only scan inside the dorm area configured by the admin.
+  if (session.role === "Guard") {
+    const area = await prisma.dormLocation.findUnique({ where: { id: 1 } })
+    if (area) {
+      const lat = Number(body.latitude)
+      const lng = Number(body.longitude)
+      if (body.latitude == null || body.longitude == null || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+        return jsonError("Location unavailable. Turn on GPS and allow location access to scan.", 403)
+      }
+      const dist = Math.round(distanceMeters(lat, lng, area.latitude, area.longitude))
+      if (dist > area.radius_meters) {
+        return jsonError(
+          `You are outside the dorm area (${dist.toLocaleString()} m away, allowed ${area.radius_meters.toLocaleString()} m). Move inside the area to scan.`,
+          403
+        )
+      }
+    }
+  }
 
   try {
     const user = await prisma.user.findUnique({
@@ -78,14 +118,21 @@ export async function POST(req: NextRequest) {
         })
       }
 
+      const lastVisitorLog = await prisma.accessLog.findFirst({
+        where: { visitor_id: visitor.id },
+        orderBy: { timestamp: "desc" },
+      })
+
       if (accessType === "CheckOut") {
-        const lastLog = await prisma.accessLog.findFirst({
-          where: { visitor_id: visitor.id },
-          orderBy: { timestamp: "desc" },
-        })
-        if (!lastLog || lastLog.access_type !== "CheckIn") {
+        if (!lastVisitorLog || lastVisitorLog.access_type !== "CheckIn") {
+          if (lastVisitorLog?.access_type === "CheckOut") {
+            return alreadyScanned(visitor, "CheckOut", lastVisitorLog.timestamp)
+          }
           return jsonError("Cannot check out. Visitor has not checked in yet.", 400)
         }
+      } else if (lastVisitorLog) {
+        // Pass already used to check in (and possibly out) - do not allow another entry.
+        return alreadyScanned(visitor, lastVisitorLog.access_type, lastVisitorLog.timestamp)
       }
 
       if (mode === "preview") {

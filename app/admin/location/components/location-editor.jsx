@@ -29,7 +29,6 @@ export function LocationEditor({ initial }) {
   const [value, setValue] = useState(initial ? String(initial.radius_meters) : "500")
   const [saving, setSaving] = useState(false)
   const [locating, setLocating] = useState(false)
-  const [accuracy, setAccuracy] = useState(null)
   const [saved, setSaved] = useState(initial)
 
   const radius = useMemo(() => Math.round(toMeters(value, unit)), [value, unit])
@@ -41,7 +40,6 @@ export function LocationEditor({ initial }) {
     if (!navigator.geolocation) return toast.error("Geolocation is not supported by this browser.")
     if (locating) return
     setLocating(true)
-    setAccuracy(null)
     let best = null
     const GOOD_ENOUGH = 25 // meters
     const MAX_WAIT = 20000 // ms
@@ -54,15 +52,7 @@ export function LocationEditor({ initial }) {
       setLocating(false)
       if (!best) return toast.error("Could not get your location. Allow location access or click the map.")
       pick(best.coords.latitude, best.coords.longitude)
-      const acc = Math.round(best.coords.accuracy)
-      setAccuracy(acc)
-      if (acc > 100) {
-        toast.warning(
-          `Location is only accurate to about ${acc.toLocaleString()} m. This device has no GPS (common on laptops/PCs). Click the exact spot on the map or use a phone for a precise pin.`
-        )
-      } else {
-        toast.success(`Pinned your location (accurate to about ${acc} m).`)
-      }
+      toast.success("Pinned your location. Drag the pin or click the map to adjust it.")
     }
 
     watchId = navigator.geolocation.watchPosition(
@@ -70,7 +60,6 @@ export function LocationEditor({ initial }) {
         if (!best || p.coords.accuracy < best.coords.accuracy) {
           best = p
           pick(p.coords.latitude, p.coords.longitude)
-          setAccuracy(Math.round(p.coords.accuracy))
         }
         if (p.coords.accuracy <= GOOD_ENOUGH) finish()
       },
@@ -110,7 +99,7 @@ export function LocationEditor({ initial }) {
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-2">
         <LocationMap position={position} radius={radius} onPick={pick} />
-        <p className="text-xs text-muted-foreground">Click anywhere on the map to place the dormitory pin.</p>
+        <p className="text-xs text-muted-foreground">Click the map to place the dormitory pin, or drag the pin to fine-tune its position.</p>
       </div>
 
       <div className="space-y-5 rounded-xl border bg-card p-6 shadow-sm h-fit">
@@ -147,12 +136,6 @@ export function LocationEditor({ initial }) {
           {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
           {locating ? "Getting precise location..." : "Use my current location"}
         </Button>
-        {accuracy != null && (
-          <p className={`text-xs ${accuracy > 100 ? "text-amber-600" : "text-muted-foreground"}`}>
-            Accuracy: about {accuracy.toLocaleString()} m
-            {accuracy > 100 ? " — too rough; click the exact spot on the map instead." : ""}
-          </p>
-        )}
 
         <Button type="button" className="w-full gap-2" onClick={save} disabled={saving}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}

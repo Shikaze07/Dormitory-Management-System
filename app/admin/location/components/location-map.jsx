@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect } from "react"
 import L from "leaflet"
@@ -52,7 +52,17 @@ export default function LocationMap({ position, radius, onPick }) {
       <ClickHandler onPick={onPick} />
       {position && (
         <>
-          <Marker position={position} icon={markerIcon} />
+          <Marker
+            position={position}
+            icon={markerIcon}
+            draggable
+            eventHandlers={{
+              dragend(e) {
+                const ll = e.target.getLatLng()
+                onPick(ll.lat, ll.lng)
+              },
+            }}
+          />
           <Circle center={position} radius={radius} pathOptions={{ color: "#2563eb", fillOpacity: 0.15 }} />
           <Recenter position={position} radius={radius} />
         </>

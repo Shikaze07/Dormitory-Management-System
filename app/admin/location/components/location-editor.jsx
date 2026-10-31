@@ -45,27 +45,41 @@ export function LocationEditor({ initial }) {
     let timer = null
     let finished = false
 
-    const finish = () => {
+    const finish = (denied) => {
       if (finished) return
       finished = true
       navigator.geolocation.clearWatch(watchId)
       clearTimeout(timer)
       setLocating(false)
-      if (!best) return toast.error("Could not get your location. Allow location access or click the map.")
+      if (!best) {
+        return toast.error(
+          denied
+            ? "Location access is blocked. Allow it in your browser, or click the map."
+            : "Could not get your location. Click the map to place the pin."
+        )
+      }
       pick(best.coords.latitude, best.coords.longitude)
       toast.success("Pinned your location. Drag the pin or click the map to adjust it.")
     }
 
-    // Collect fixes for ~3 seconds and keep the most accurate one.
+    // Wait up to 10s for the first fix, then collect for 3s and keep the most accurate one.
+    timer = setTimeout(() => finish(false), 10000)
     watchId = navigator.geolocation.watchPosition(
       (p) => {
-        if (!best || p.coords.accuracy < best.coords.accuracy) best = p
-        if (p.coords.accuracy <= 15) finish()
+        const first = !best
+        if (first || p.coords.accuracy < best.coords.accuracy) best = p
+        if (p.coords.accuracy <= 15) return finish(false)
+        if (first) {
+          clearTimeout(timer)
+          timer = setTimeout(() => finish(false), 3000)
+        }
       },
-      () => finish(),
-      { enableHighAccuracy: true, timeout: 3000, maximumAge: 0 }
+      (err) => {
+        // Only a blocked permission is fatal; timeouts just mean "keep waiting".
+        if (err.code === 1) finish(true)
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     )
-    timer = setTimeout(finish, 3000)
   }
 
   const save = async () => {

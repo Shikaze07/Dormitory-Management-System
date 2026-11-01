@@ -34,21 +34,21 @@ export default async function DormitoryPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-primary mb-1">
-            <DoorOpen className="h-6 w-6" />
-            <h2 className="text-3xl font-bold tracking-tight">Dormitory Management</h2>
+            {/* <DoorOpen className="h-6 w-6" />
+            <h2 className="text-3xl font-bold tracking-tight">Dormitory Management</h2> */}
           </div>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             Manage your dormitory rooms, capacity, and current occupancy.
-          </p>
+          </p> */}
         </div>
         <div className="flex items-center gap-2">
-          
+
           <AddRoomDialog />
         </div>
       </div>
-      
-      <Separator className="my-6" />
-      
+
+      {/* <Separator className="my-6" /> */}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <div className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -37,21 +37,21 @@ export default async function RoomAssignmentPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-primary mb-1">
-            <BookCheck className="h-6 w-6" />
-            <h2 className="text-3xl font-bold tracking-tight">Room Assignments</h2>
+            {/* <BookCheck className="h-6 w-6" />
+            <h2 className="text-3xl font-bold tracking-tight">Room Assignments</h2> */}
           </div>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             Monitor and manage resident room allocations and history.
-          </p>
+          </p> */}
         </div>
         <div className="flex items-center gap-2">
-         
+
           <AddAssignmentDialog />
         </div>
       </div>
-      
-      <Separator className="my-6" />
-      
+
+      {/* <Separator className="my-6" /> */}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <div className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -93,8 +93,8 @@ export default async function RoomAssignmentPage() {
             <BookCheck className="h-4 w-4 text-blue-500" />
           </div>
           <div className="text-2xl font-bold text-blue-600">
-            {assignments && assignments.length > 0 
-              ? Math.round((inactiveAssignments.length / assignments.length) * 100) 
+            {assignments && assignments.length > 0
+              ? Math.round((inactiveAssignments.length / assignments.length) * 100)
               : 0}%
           </div>
           <p className="text-xs text-muted-foreground">

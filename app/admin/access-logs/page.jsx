@@ -22,16 +22,16 @@ export default async function AdminAccessLogsPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-primary mb-1">
-            <History className="h-6 w-6" />
-            <h2 className="text-3xl font-bold tracking-tight">Access & Entry Logs</h2>
+            {/* <History className="h-6 w-6" />
+            <h2 className="text-3xl font-bold tracking-tight">Access & Entry Logs</h2> */}
           </div>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             Monitor real-time resident and visitor check-in / check-out station logs.
-          </p>
+          </p> */}
         </div>
       </div>
 
-      <Separator className="my-6" />
+      {/* <Separator className="my-6" /> */}
 
       {/* KPI Stats cards matching Room Assignment / User Management structure */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

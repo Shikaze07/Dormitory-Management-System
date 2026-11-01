@@ -13,17 +13,17 @@ export default async function UserManagementPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-primary mb-1">
-            <DoorOpen className="h-6 w-6" />
-            <h2 className="text-3xl font-bold tracking-tight">User Management</h2>
+            {/* <DoorOpen className="h-6 w-6" />
+            <h2 className="text-3xl font-bold tracking-tight">User Management</h2> */}
           </div>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             Manage dormitory residents, security guards, and administrators.
-          </p>
+          </p> */}
         </div>
 
         <AddUserDialog />
       </div>
-      <Separator className="my-6" />
+      {/* <Separator className="my-6" /> */}
       <DataTable columns={columns} data={users || []} />
 
     </div>

@@ -95,13 +95,13 @@ export default async function AdminDashboardPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-primary mb-1">
-            <LayoutDashboard className="h-6 w-6" />
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            {/* <LayoutDashboard className="h-6 w-6" />
+            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2> */}
           </div>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             Overview of dormitory occupancy, gate activity, and visitor requests for{" "}
             {format(new Date(), "EEEE, MMMM d, yyyy")}.
-          </p>
+          </p> */}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm">
@@ -115,8 +115,8 @@ export default async function AdminDashboardPage() {
           </Button>
         </div>
       </div>
-
-      <Separator className="my-6" />
+      {/* 
+      <Separator className="my-6" /> */}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard

@@ -15,27 +15,27 @@ export default async function VisitorRequestsPage() {
   const { requests, error } = await getVisitorRequests()
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="flex-1 space-y-4 p-8 pt-2">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-primary mb-1">
-            <UserPlus className="h-6 w-6" />
-            <h2 className="text-3xl font-bold tracking-tight">Visitor Requests</h2>
+            {/* <UserPlus className="h-6 w-6" />
+            <h2 className="text-3xl font-bold tracking-tight">Visitor Requests</h2> */}
           </div>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             Register visitors and manage their time-bound access QR codes.
-          </p>
+          </p> */}
         </div>
         <AddVisitorDialog />
       </div>
-      
-      <Separator className="my-6" />
-      
+
+      {/* <Separator className="my-6" /> */}
+
       {error ? (
         <div className="p-8 text-center bg-destructive/5 border border-destructive/20 rounded-xl">
-           <ShieldQuestion className="mx-auto h-10 w-10 text-destructive/40 mb-4" />
-           <h3 className="text-lg font-semibold text-destructive">Unable to Load Requests</h3>
-           <p className="text-muted-foreground">{error}</p>
+          <ShieldQuestion className="mx-auto h-10 w-10 text-destructive/40 mb-4" />
+          <h3 className="text-lg font-semibold text-destructive">Unable to Load Requests</h3>
+          <p className="text-muted-foreground">{error}</p>
         </div>
       ) : (
         <>
@@ -48,7 +48,7 @@ export default async function VisitorRequestsPage() {
               <div className="text-2xl font-bold">{requests?.length || 0}</div>
               <p className="text-xs text-muted-foreground">Registered visits</p>
             </div>
-            
+
             <div className="rounded-xl border bg-card p-6 shadow-sm">
               <div className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <h3 className="text-sm font-medium">Active Passes</h3>
@@ -84,9 +84,9 @@ export default async function VisitorRequestsPage() {
           </div>
 
           <div className="pt-4">
-            <DataTable 
-              data={(requests as any) || []} 
-              columns={columns as any} 
+            <DataTable
+              data={(requests as any) || []}
+              columns={columns as any}
             />
           </div>
         </>

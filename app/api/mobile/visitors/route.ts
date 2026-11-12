@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   if (last.length < 2) return jsonError("Last name must be at least 2 characters.")
   if (isNaN(expected.getTime())) return jsonError("Invalid expected date.")
   const win = computeVisitWindow(String(b.expected_at), Number(b.tz_offset))
-  if (!win || win.seconds <= 0) return jsonError("It is too late to register a visit for this date. Please pick a later date.")
+  if (!win || win.seconds <= 0) return jsonError("Today's visit window has already ended (passes expire at 11:59 PM). Please set the Expected Date of Visit to tomorrow or a later date.")
   const secs = win.seconds
 
   const purposeText = String(b.purpose || "").trim()

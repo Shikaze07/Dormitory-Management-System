@@ -242,7 +242,7 @@ export function AddVisitorDialog() {
               tabIndex={-1}
               value={
                 tooLate
-                  ? "Too late to register for this date"
+                  ? "Today's window has ended. Set the Expected Date of Visit to tomorrow or later."
                   : `${formatVisitDuration(visitWindow!.seconds)} (until 11:59 PM)`
               }
               className="bg-muted/40 cursor-default focus-visible:ring-0"

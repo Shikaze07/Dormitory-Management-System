@@ -232,7 +232,15 @@ export function AddVisitorDialog() {
               {...register("expected_at")}
               className={errors.expected_at ? "border-destructive" : ""}
             />
-            {errors.expected_at && <p className="text-xs text-destructive">{errors.expected_at.message}</p>}
+            {errors.expected_at ? (
+              <p className="text-xs text-destructive">{errors.expected_at.message}</p>
+            ) : (
+              tooLate && (
+                <p className="text-xs text-destructive">
+                  {expectedAt ? "Today's passes have ended. Please set the expected date to tomorrow or later." : "Please set the Expected Date of Visit."}
+                </p>
+              )
+            )}
           </div>
 
           <div className="space-y-2">
@@ -242,7 +250,7 @@ export function AddVisitorDialog() {
               tabIndex={-1}
               value={
                 tooLate
-                  ? "Today's window has ended. Set the Expected Date of Visit to tomorrow or later."
+                  ? "—"
                   : `${formatVisitDuration(visitWindow!.seconds)} (until 11:59 PM)`
               }
               className="bg-muted/40 cursor-default focus-visible:ring-0"

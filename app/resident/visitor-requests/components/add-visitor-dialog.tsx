@@ -28,6 +28,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { visitorRequestSchema, VisitorRequestFormValues } from "@/lib/validations/visitor"
 import { createVisitorRequest } from "@/lib/actions/visitor-actions"
+import { computeVisitWindow, formatVisitDuration } from "@/lib/visitor-pass"
 
 function todayLocal() {
   const d = new Date()
@@ -46,6 +47,7 @@ export function AddVisitorDialog() {
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = useForm<VisitorRequestFormValues>({
     resolver: zodResolver(visitorRequestSchema),
@@ -57,16 +59,13 @@ export function AddVisitorDialog() {
       gender: "Male",
       purpose: "",
       expected_at: todayLocal(),
-      visit_hours: 1,
-      visit_minutes: 0,
-      visit_seconds: 0,
     },
   })
 
   async function onSubmit(data: VisitorRequestFormValues) {
     setIsSubmitting(true)
     try {
-      const result = await createVisitorRequest(data)
+      const result = await createVisitorRequest({ ...data, tz_offset: new Date().getTimezoneOffset() })
       if (result.success) {
         toast.success("Visitor request registered successfully")
         setOpen(false)
@@ -114,8 +113,10 @@ export function AddVisitorDialog() {
     setValue("photo", "", { shouldValidate: true })
   }
 
-  const durationError =
-    errors.visit_hours?.message || errors.visit_minutes?.message || errors.visit_seconds?.message
+  // Re-evaluated every render so the read-only duration tracks the clock and the chosen date.
+  const expectedAt = watch("expected_at")
+  const visitWindow = open ? computeVisitWindow(expectedAt, new Date().getTimezoneOffset()) : null
+  const tooLate = !visitWindow || visitWindow.seconds <= 0
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -235,43 +236,20 @@ export function AddVisitorDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label>Visit Duration (HH : MM : SS)</Label>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1">
-                <Input
-                  type="number"
-                  min={0}
-                  max={24}
-                  placeholder="HH"
-                  aria-label="Hours"
-                  {...register("visit_hours", { valueAsNumber: true })}
-                />
-                <p className="text-[10px] text-muted-foreground text-center">Hours</p>
-              </div>
-              <div className="space-y-1">
-                <Input
-                  type="number"
-                  min={0}
-                  max={59}
-                  placeholder="MM"
-                  aria-label="Minutes"
-                  {...register("visit_minutes", { valueAsNumber: true })}
-                />
-                <p className="text-[10px] text-muted-foreground text-center">Minutes</p>
-              </div>
-              <div className="space-y-1">
-                <Input
-                  type="number"
-                  min={0}
-                  max={59}
-                  placeholder="SS"
-                  aria-label="Seconds"
-                  {...register("visit_seconds", { valueAsNumber: true })}
-                />
-                <p className="text-[10px] text-muted-foreground text-center">Seconds</p>
-              </div>
-            </div>
-            {durationError && <p className="text-xs text-destructive">{durationError}</p>}
+            <Label>Visit Duration</Label>
+            <Input
+              readOnly
+              tabIndex={-1}
+              value={
+                tooLate
+                  ? "Too late to register for this date"
+                  : `${formatVisitDuration(visitWindow!.seconds)} (until 11:59 PM)`
+              }
+              className="bg-muted/40 cursor-default focus-visible:ring-0"
+            />
+            <p className="text-[10px] text-muted-foreground">
+              Set automatically: the pass is valid until 11:59 PM on the visit date.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -288,7 +266,7 @@ export function AddVisitorDialog() {
           <div className="rounded-lg bg-amber-50/50 border border-amber-100 p-3 flex gap-2">
             <Info className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
             <p className="text-[11px] text-amber-700 leading-normal">
-              Registered visitors will be granted a QR code valid for 24 hours from the time of registration.
+              Registered visitors will be granted a QR code valid until 11:59 PM on the date of the visit.
               Residents are responsible for their visitors' conduct within the premises.
             </p>
           </div>
@@ -305,7 +283,7 @@ export function AddVisitorDialog() {
           >
             Cancel
           </Button>
-          <Button type="submit" form="add-visitor-form" disabled={isSubmitting || isUploading} className="min-w-[120px]">
+          <Button type="submit" form="add-visitor-form" disabled={isSubmitting || isUploading || tooLate} className="min-w-[120px]">
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

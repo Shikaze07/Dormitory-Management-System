@@ -4,18 +4,23 @@ import { getMobileSession, jsonError } from "@/lib/mobile-auth"
 import { distanceMeters } from "@/lib/geo"
 
 function alreadyScanned(
-  visitor: { first_name: string; last_name: string; photo?: string | null },
+  person: { first_name: string; last_name: string; photo?: string | null },
   previousType: string,
-  at: Date
+  at: Date,
+  kind: "Resident" | "Visitor" = "Visitor"
 ) {
   const when = new Date(at).toLocaleString("en-PH", { timeZone: "Asia/Manila" })
-  const action = previousType === "CheckOut" ? "checked out" : "checked in"
+  const name = `${person.first_name} ${person.last_name}`
+  const message =
+    previousType === "CheckOut"
+      ? `${name} has already checked out on ${when}.${kind === "Visitor" ? " This visitor pass can no longer be used." : ""}`
+      : `${name} is already checked in since ${when} and has not checked out yet.`
   return NextResponse.json(
     {
-      error: `ALREADY SCANNED: ${visitor.first_name} ${visitor.last_name} was already ${action} on ${when}.`,
+      error: `ALREADY SCANNED: ${message}`,
       alreadyScanned: true,
-      name: `${visitor.first_name} ${visitor.last_name}`,
-      photo: visitor.photo ?? null,
+      name,
+      photo: person.photo ?? null,
       previousType,
       scannedAt: at,
     },
@@ -64,14 +69,20 @@ export async function POST(req: NextRequest) {
     if (user) {
       if (!user.is_active) return jsonError("User account is deactivated.")
 
+      const lastLog = await prisma.accessLog.findFirst({
+        where: { user_id: user.id },
+        orderBy: { timestamp: "desc" },
+      })
       if (accessType === "CheckOut") {
-        const lastLog = await prisma.accessLog.findFirst({
-          where: { user_id: user.id },
-          orderBy: { timestamp: "desc" },
-        })
         if (!lastLog || lastLog.access_type !== "CheckIn") {
+          if (lastLog?.access_type === "CheckOut") {
+            return alreadyScanned(user, "CheckOut", lastLog.timestamp, "Resident")
+          }
           return jsonError("Cannot check out. Resident has not checked in yet.", 400)
         }
+      } else if (lastLog?.access_type === "CheckIn") {
+        // Still inside: they must be checked out before they can check in again.
+        return alreadyScanned(user, "CheckIn", lastLog.timestamp, "Resident")
       }
 
       const log = await prisma.accessLog.create({
@@ -105,6 +116,8 @@ export async function POST(req: NextRequest) {
           })
         : null
       const hostRoom = hostAssignment?.room?.room_number ?? null
+      // The pass ends at 11:59 PM; show the time left at the moment of the scan.
+      const remainingSecs = Math.max(0, Math.floor((new Date(visitor.qr_expires_at).getTime() - Date.now()) / 1000))
 
       if (mode === "reject") {
         if (visitor.visit_request) {
@@ -148,7 +161,8 @@ export async function POST(req: NextRequest) {
           visiting: host ? `${host.first_name} ${host.last_name}` : null,
           host_room: hostRoom,
           purpose: visitor.visit_request?.purpose ?? null,
-          visit_duration_seconds: visitor.visit_duration_seconds ?? null,
+          visit_duration_seconds: remainingSecs,
+          valid_until: visitor.qr_expires_at,
           expected_at: visitor.visit_request?.expected_at ?? null,
           accessType,
         })
@@ -170,7 +184,8 @@ export async function POST(req: NextRequest) {
         visiting: host ? `${host.first_name} ${host.last_name}` : null,
         host_room: hostRoom,
         purpose: visitor.visit_request?.purpose ?? null,
-        visit_duration_seconds: visitor.visit_duration_seconds ?? null,
+        visit_duration_seconds: remainingSecs,
+        valid_until: visitor.qr_expires_at,
         name: `${visitor.first_name} ${visitor.last_name}`,
         detail: `Visiting ${host ? `${host.first_name} ${host.last_name}` : "N/A"} • ${
           visitor.visit_request?.purpose || "Personal Visit"

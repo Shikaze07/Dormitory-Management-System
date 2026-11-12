@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { randomUUID } from "crypto"
 import prisma from "@/lib/prisma"
 import { getMobileSession, jsonError } from "@/lib/mobile-auth"
+import { computeVisitWindow } from "@/lib/visitor-pass"
 
 export async function GET(req: NextRequest) {
   const session = await getMobileSession(req)
@@ -42,14 +43,12 @@ export async function POST(req: NextRequest) {
   if (first.length < 2) return jsonError("First name must be at least 2 characters.")
   if (last.length < 2) return jsonError("Last name must be at least 2 characters.")
   if (isNaN(expected.getTime())) return jsonError("Invalid expected date.")
-  const today = new Date().toISOString().slice(0, 10)
-  if (String(b.expected_at).slice(0, 10) < today) return jsonError("Expected date cannot be in the past.")
+  const win = computeVisitWindow(String(b.expected_at), Number(b.tz_offset))
+  if (!win || win.seconds <= 0) return jsonError("It is too late to register a visit for this date. Please pick a later date.")
+  const secs = win.seconds
 
   const purposeText = String(b.purpose || "").trim()
   if (purposeText.length < 5) return jsonError("Purpose must be at least 5 characters.")
-  const secs = Math.round(Number(b.visit_duration_seconds)) || 0
-  if (secs <= 0) return jsonError("Visit duration must be greater than 0.")
-  if (secs > 86400) return jsonError("Visit duration cannot exceed 24 hours.")
   const photo = String(b.photo || "").trim()
   if (!photo) return jsonError("Visitor photo is required.")
 
@@ -64,7 +63,7 @@ export async function POST(req: NextRequest) {
           photo,
           visit_duration_seconds: secs,
           qr_code: `VISIT-${randomUUID()}`,
-          qr_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          qr_expires_at: win.expiresAt,
         },
       })
       await tx.visitorRequest.create({
